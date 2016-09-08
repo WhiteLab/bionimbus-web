@@ -91,3 +91,7 @@ ENV/
 # Django specific
 migrations/
 local_settings.py
+bower_components/*
+
+# Pycharm specific
+.idea/*
