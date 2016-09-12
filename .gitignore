@@ -92,6 +92,7 @@ ENV/
 migrations/
 local_settings.py
 bower_components/*
+*.sqlite3
 
 # Pycharm specific
 .idea/*

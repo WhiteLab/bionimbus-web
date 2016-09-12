@@ -38,7 +38,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djangobower'
+    'djangobower',
+    'tina'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -52,7 +53,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'bionimbus_web.urls'
+ROOT_URLCONF = 'tina_web.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'bionimbus_web.wsgi.application'
+WSGI_APPLICATION = 'tina_web.wsgi.application'
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -117,4 +118,6 @@ BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'bower_components')
 
 BOWER_INSTALLED_APPS = (
     'jquery',
+    'bootstrap',
+    'fontawesome'
 )
