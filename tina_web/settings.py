@@ -114,10 +114,26 @@ MEDIA_URL = '/media/'
 LOGIN_URL = '/login/'
 
 # Bower Django settings
-BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'bower_components')
+BOWER_COMPONENTS_ROOT = BASE_DIR
 
 BOWER_INSTALLED_APPS = (
     'jquery',
+    'jquery-toast-plugin',
+    'handsontable',
+
     'bootstrap',
-    'fontawesome'
+    'fontawesome',
+
+    'bourbon',
+    'neat',
+
+    'polymer', 'PolymerElements/iron-icon'
+
+    # 'bottom-drawer'  # Polymer element
 )
+
+# Application wide strings
+STRINGS = {
+    'app_name': 'Tina',
+    'installed_app_name': 'tina'
+}

@@ -1,0 +1,127 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="sliding-option-button">
+    <template>
+        <style>
+            :host {
+              display: flex;
+              flex-direction: row;
+              text-align: center;
+              width: 100%;
+              position: relative;
+              background-color: #eee;
+              font-size: var(--font-size, 2rem);
+              outline: none;
+              border: none;
+              color: var(--foreground-color, #141914);
+            }
+            :host:hover ::content > a {
+              flex-grow: 1;
+            }
+            :host:hover ::content > a:hover:before {
+              background-color: var(--foreground-color, #141914);
+            }
+            :host ::content > a {
+              /*padding-top: 8px;
+              padding-bottom: 8px;*/
+              padding-top: var(--padding-top, 8px);
+              padding-bottom: var(--padding-bottom, 8px);
+              position: relative;
+              flex-grow: 0;
+              flex-shrink: 1;
+              width: 0;
+              overflow: hidden;
+              -webkit-transition: flex-grow 0.3s;
+              -moz-transition: flex-grow 0.3s;
+              transition: flex-grow 0.3s;
+            }
+            :host ::content > a:before {
+              content: '';
+              position: absolute;
+              display: block;
+              /*height: 4px;*/
+              height: var(--height, 4px);
+              background-color: transparent;
+              top: 0;
+              left: 0;
+              width: 100%;
+              -webkit-transition: background-color 0.3s ease;
+              -moz-transition: background-color 0.3s ease;
+              transition: background-color 0.3s ease;
+            }
+            :host ::content > a:first-child {
+              flex-grow: var(--primary-option-flex-size, 4);
+              flex-shrink: 0;
+            }
+        </style>
+
+
+
+
+        <content></content>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'sliding-option-button',
+            properties: {
+                'option-colors': {
+                    type: String,
+                    value: '#eee'
+                },
+                'primary-option-flex': {
+                    type: String,
+                    value: '4'
+                },
+                'size': {
+                    type: String,
+                    value: 'regular'
+                }
+            },
+
+            attached: function() {
+                // Set option links background colors
+                var bgcolorCycle = this['option-colors'].trim().split(' ');
+                var bgcolorCycleLen = bgcolorCycle.length;
+
+                var linkElements = this.getContentChildren();
+                for (var i = 0; i < linkElements.length; i++) {
+                    linkElements[i].style.backgroundColor = bgcolorCycle[i % bgcolorCycleLen];
+                }
+
+                // Set flex size of primary option
+                var styles = {'--primary-option-flex-size': this['primary-option-flex']};
+                if (this.isSlim()) {
+                    styles['--font-size'] = '1.5rem';
+                    styles['--padding-top'] = '0';
+                    styles['--padding-bottom'] = '0';
+                    styles['--height'] = '2px';
+                } else if (this.isLarge()) {
+                    styles['--font-size'] = '3rem';
+                    styles['--padding-top'] = '16px';
+                    styles['--padding-bottom'] = '16px';
+                    styles['--height'] = '6px';
+                }
+
+                this.updateStyles(styles);
+            },
+
+            isSlim: function() {
+                var size = this.size.trim().toLowerCase();
+                return size == 'slim' ||
+                        size == 'small' ||
+                        size == 'sm' ||
+                        size == 's';
+            },
+
+            isLarge: function() {
+                var size = this.size.trim().toLowerCase();
+                return size == 'large' ||
+                        size == 'lg' ||
+                        size == 'l' ||
+                        size == 'jumbo' ||
+                        size == 'plus';
+            }
+        });
+    </script>
+</dom-module>

@@ -1,10 +1,68 @@
 <!DOCTYPE html>
+{% load staticfiles %}
+{% load strings %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello</title>
+    <title>{% strings 'app_name' %}{% block extended_title %}{% endblock %}</title>
+
+    <!-- Polymer -->
+    <script src="{% static 'webcomponentsjs/webcomponents-lite.min.js' %}"></script>
+
+    <!-- Google Web Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro:300,400" rel="stylesheet">
+
+    <!-- Boostrap Grid System, Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.grid.css' %}"/>
+    <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}"/>
+
+    <!-- Custom Application-level CSS -->
+    <link rel="stylesheet" href="{% static 'css/tina.css' %}"/>
+    {% block extra_css %}{% endblock %}
+
+    <!-- Jquery library -->
+    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+
+    <!-- Jquery toast plugin -->
+    <script src="{% static 'jquery-toast-plugin/dist/jquery.toast.min.js' %}"></script>
+{#    <link rel="stylesheet" href="{% static 'jquery-toast-plugin/dist/jquery.toast.min.css' %}">#}
+
+    <!-- Handson Table -->
+    <script src="{% static 'handsontable/dist/handsontable.full.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'handsontable/dist/handsontable.full.css' %}"/>
+
+    <!-- Custom JS utilities -->
+    <script src="{% static 'js/util.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </head>
 <body>
-Tina
+    <nav class="tina-nav">
+        <span style="font-size:3rem">
+            <a href="/"><span class="fa fa-skyatlas"></span></a>&nbsp;&nbsp;{% strings 'app_name' %}
+        </span>
+        <div class="tina-nav-right">
+            <a href="#"><span class="tina-nav-content">Libraries</span></a>
+            <a href="{% url 'manage_project' %}"><span class="tina-nav-content">Projects</span></a>
+            <a href="{% url 'submit_library' %}"><span class="tina-nav-content">Submit</span></a>
+        </div>
+    </nav>
+    <div class="container tina-content">
+        {% block content %}
+        {% endblock content %}
+{#        <div class="row">#}
+{#            <span class="tina-header">Submit a Sample</span>#}
+{#            <p>Using the form below or maybe downloaded, submit a sample for sequencing.</p>#}
+{#        </div>#}
+{#        <div class="row">#}
+{#            <div class="col-sm-6">#}
+{#                <a href="#" class="tina-btn">Submit&nbsp;&nbsp;<span class="fa fa-chevron-right"></span></a>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="row">#}
+{#            <div class="col-sm-6 col-sm-offset-6">#}
+{#                <input type="text"/>#}
+{#            </div>#}
+{#        </div>#}
+    </div>
 </body>
 </html>

@@ -1,0 +1,55 @@
+{% extends 'tina/base.html' %}
+{% load staticfiles %}
+
+{% block extended_title %} | Add Project{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/project/add_project.js' %}"></script>
+{% endblock extra_js %}
+
+{% block content %}
+    <div class="row" style="margin-bottom:50px">
+        <div class="col-sm-8">
+            <span class="tina-header">Add Project</span>
+        </div>
+    </div>
+    <form class="bootstrap-form" action="{% if action == 'add' %}{% url 'add_project' %}{% else %}{% url 'edit_project' project_pk %}{% endif %}" method="post"  enctype="multipart/form-data" style="margin-bottom:50px">
+        {% csrf_token %}
+        {% for field in project_form %}
+            <div class="row">
+                <div class="col-sm-3">
+                    {{ field.label_tag }}
+                </div>
+                <div class="col-sm-9">
+                    {{ field }}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-sm-3">
+                Other Metadata:
+            </div>
+            <div class="col-sm-9">
+                <div id="project-metadata-handsontable" class="handsontable"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-1">
+                <span class="tina-header">Library Defaults:</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3">
+                Default Other Metadata Keys:
+            </div>
+            <div class="col-sm-9">
+                <div id="library-metadata-handsontable" class="handsontable"></div>
+            </div>
+        </div>
+
+        <button class="tina-btn-lg">Submit</button>
+    </form>
+{% endblock content %}

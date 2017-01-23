@@ -1,0 +1,94 @@
+{% extends 'tina/base.html' %}
+{% load staticfiles %}
+
+{% block extended_title %} | Manage Projects{% endblock %}
+
+{% if messages %}
+    {% block extra_js %}
+        <script>
+            $(document).ready(function() {
+                {% for message in messages %}
+                    $.toast({
+                        heading: '{{ message.tags|title }}',
+                        text: '{{ message }}',
+                        bgColor: '#138a36',
+                        textColor: '#e1e6e1',
+                        loaderBg: '#333333',
+                        position: 'bottom-right'
+                    });
+                {% endfor %}
+            });
+        </script>
+        <script src="{% static 'js/project/manage_project.js' %}"></script>
+    {% endblock extra_js %}
+{% endif %}
+
+{% block content %}
+    <link rel="import" href="{% static 'tags/flip-card.html' %}">
+    <link rel="import" href="{% static 'tags/sliding-option-button.html' %}">
+<div class="row" style="margin-bottom:50px">
+    <div class="col-sm-8">
+        <span class="tina-header">{% if toplevel %} Toplevel Projects {% else %} Subprojects of {{ parent_project.name }}{% endif %}
+            {% if not toplevel %}
+                <a href="
+                    {% if parent_project.is_subproject %}
+                        {% url 'manage_subproject' parent_project.parent_project.pk %}
+                    {% else %}
+                        {% url 'manage_project' %}
+                    {% endif %}
+                "><span class="fa fa-level-up"></span></a>
+            {% endif %}
+        </span>
+    </div>
+    <div class="col-sm-4">
+        <a href="{% url 'add_project' %}" class="tina-btn"><span class="fa fa-plus"></span>&nbsp;&nbsp;Add</a>
+    </div>
+</div>
+<div id="projects-matrix">
+    {% for project in projects %}
+    <flip-card data-delete-url="{% url 'delete_project' project.pk %}"{% if project.project_cover_image %} background="url({{ MEDIA_URL }}{{ project.project_cover_image.url }})"{% endif %}>
+        <flip-card-title>{{ project.name }}</flip-card-title>
+        <flip-card-description>
+            <sliding-option-button size="small" option-colors="#e1e6e1">
+                <a href="{% url 'view_project' project.pk %}" title="View Project">View</a>
+                {% if project.subprojects %}<a href="{% url 'manage_subproject' project.pk %}" title="Subprojects"><span class="fa fa-level-down"></span></a>{% endif %}
+                <a href="{% url 'edit_project' project.pk %}" title="Edit Project"><span class="fa fa-pencil"></span></a>
+                <a href="#" title="Delete Project" onclick="return false;" class="delete-button"><span class="fa fa-trash"></span></a>
+            </sliding-option-button>
+            {{ project.description }}
+        </flip-card-description>
+        <flip-card-footnote>
+            PI {{ project.pi }}{% if project.public %} | Public{% endif %}
+        </flip-card-footnote>
+    </flip-card>
+    {% empty %}
+        <span>No {% if not toplevel %}sub{% endif %}projects to display</span>
+    {% endfor %}
+
+
+
+{#    <div class="tina-flip-card">#}
+{#        <header style="background-image:url('{% static 'img/bg.jpg' %}')"></header>#}
+{#        <section>#}
+{#            <header>#}
+{#                <div>HTML and CSS</div>#}
+{#                <div>AtoZ CSS Screencast</div>#}
+{#            </header>#}
+{#            <article>#}
+{#                <div class="tina-sliding-btn-group-sm">#}
+{#                    <a href="#">View</a>#}
+{#                    <a href="#">Lib</a>#}
+{#                    <a href="#">Edit</a>#}
+{#                </div>#}
+{#                <div>This is some filler text that will appear at hover. This is a lot more of#}
+{#                that filler text that I'm including here. More Mort I'm including here. More Mort I'm including here. More Mort I'm including here. More Mort I'm including here. More More more more more talking about#}
+{#                whatever here and doing it in style.</div>#}
+{##}
+{#            </article>#}
+{#        </section>#}
+{#        <footer>#}
+{#            <span>Dominic Fitzgerald, 9 hours ago</span>#}
+{#        </footer>#}
+{#    </div>#}
+</div>
+{% endblock content %}

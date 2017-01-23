@@ -1,0 +1,27 @@
+{% extends 'tina/base.html' %}
+{% block content %}
+    <div class="row" style="margin-bottom:50px">
+        <div class="col-sm-8">
+            <span class="tina-header">Viewing {{ project.name }}</span>
+        </div>
+    </div>
+    <div class="tina-project-view-desc">
+        {% firstof project.description 'No Description' %}
+    </div>
+    <div>PI: {% firstof project.PI 'None' %}</div>
+    <div>Cloud: {% firstof project.cloud 'None' %}</div>
+    <div>Organism: {% firstof project.organism 'None' %}</div>
+    <div>Platform: {% firstof project.platform 'None' %}</div>
+
+    <div>Subprojects:
+        {% for subproj in project.subprojects %}
+            {{ subproj.name }}
+        {% empty %}
+            None
+        {% endfor %}
+    </div><br/>
+
+    <div>Document Details go here</div><br/>
+
+    <button class="tina-btn" onclick="window.history.back();">Back</button>
+{% endblock %}

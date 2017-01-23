@@ -1,0 +1,18 @@
+{% extends 'tina/base.html' %}
+{% load staticfiles %}
+
+{% block extended_title %} | Submit Library {% endblock %}
+
+{# Messages block may go here #}
+
+{% block extra_js %}
+<script src="{% static 'js/submit/submit.js' %}"></script>
+{% endblock extra_js %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div id="submit-handsontable" class="handsontable"></div>
+    </div>
+</div>
+{% endblock content %}

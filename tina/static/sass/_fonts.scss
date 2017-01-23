@@ -1,0 +1,9 @@
+// Fonts
+@mixin open-sans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+@mixin source-sans($weight: 400) {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: $weight;
+}

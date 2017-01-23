@@ -1,0 +1,16 @@
+@import 'bower_bourbon';
+
+.tina-progress-bar {
+  display: block;
+  width: 100%;
+  height: 8px;
+  background-color: blue;
+  border-radius: 5px;
+
+  &:after {
+    @extend .tina-progress-bar;
+    content: '';
+    background-color: red;
+    width: 70%;
+  }
+}

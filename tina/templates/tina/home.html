@@ -1,0 +1,80 @@
+{% extends 'tina/base.html' %}
+{% load staticfiles %}
+{% block content %}
+        <link rel="import" href="{% static 'tags/flip-card.html' %}">
+        <link rel="import" href="{% static 'tags/flip-card-description.html' %}">
+        <link rel="import" href="{% static 'tags/sliding-option-button.html' %}">
+        <div class="row" style="margin-bottom:50px">
+            <div class="tina-progress-bar"></div><br/>
+            <div class="tina-sliding-btn-group">
+                <a href="#" style="background-color: green;flex-grow:8">One</a>
+                <a href="http://www.google.com" style="background-color: red;">Two</a>
+                <a href="#" style="background-color: orange;">Three</a>
+            </div>
+            <sliding-option-button size="l">
+                <a href="#">One</a>
+                <a href="http://www.google.com">Two</a>
+                <a href="#">Three</a>
+                <a href="#">Three</a>
+            </sliding-option-button>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <a href="#" class="tina-btn">Submit&nbsp;&nbsp;<span class="fa fa-chevron-right"></span></a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-6">
+                <input type="text"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <span class="tina-header">Submit a Sample</span>
+            <p>Using the form below or maybe downloaded, submit a sample for sequencing.</p>
+        </div>
+        <section>
+            <section>
+                <a href="#" class="tina-btn">Submit&nbsp;&nbsp;<span class="fa fa-chevron-right"></span></a>
+            </section>
+        </section>
+        <section>
+            <section>&nbsp;</section>
+            <section>
+                <input type="text"/>
+            </section>
+        </section>
+        <flip-card bgcolor="rgba(67, 124, 144, 1)">
+            <section>
+                <header>
+                    <div>Flip Card</div>
+                </header>
+                <article>
+                    <div class="sliding-btn-wrapper">
+                        <sliding-option-button size="small" option-colors="green #eee">
+                            <a href="#">View</a>
+                            <a href="#" title="Eyeball"><span class="fa fa-eye"></span></a>
+                            <a href="#" title="Tree"><span class="fa fa-tree"></span></a>
+                        </sliding-option-button>
+                    </div>
+                    <div>This flip card is now a Polymer component. It now has content.</div>
+                </article>
+            </section>
+            <flip-card-footnote>Sponsored by Polymer</flip-card-footnote>
+        </flip-card>
+
+
+
+    <flip-card bgcolor="yellow">
+        <flip-card-title>Title</flip-card-title>
+        <flip-card-description>
+            <sliding-option-button size="small">
+                <a href="#">View</a>
+                <a href="#" title="Eyeball"><span class="fa fa-eye"></span></a>
+                <a href="#" title="Tree"><span class="fa fa-tree"></span></a>
+            </sliding-option-button>
+            Description
+        </flip-card-description>
+        <flip-card-footnote>Footer</flip-card-footnote>
+    </flip-card>
+{% endblock content %}

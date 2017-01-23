@@ -1,0 +1,147 @@
+@import 'colors', 'bower_bourbon';
+
+a.tina-btn {
+  color: $platinum;
+}
+
+.tina-btn {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  background-color: $forest_green;
+  color: $platinum !important;
+  font-size: 2rem;
+  outline: none;
+  border: none;
+  @include transition(transform 0.3s);
+  padding: {
+    top: 8px;
+    bottom: 8px;
+  }
+
+  &:active {
+    @include transform(scale(0.95));
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover:before {
+    background-color: $charcoal;
+  }
+
+  &:before {
+    content: '';
+    position: absolute;
+    display: block;
+    height: 4px;
+    background-color: transparent;
+    top: 0;
+    left: 0;
+    width: 100%;
+    @include transition(background-color 0.3s ease);
+  }
+
+  &-lg {
+    @extend .tina-btn;
+    font-size: 3rem;
+    padding: {
+      top: 16px;
+      bottom: 16px;
+    }
+
+    &:before {
+      height: 8px;
+    }
+  }
+
+  &-sm {
+    @extend .tina-btn;
+    font-size: 1.5rem;
+    padding: 0;
+
+    &:before {
+      height: 2px;
+    }
+  }
+}
+
+.tina-sliding-btn-group {
+//:host {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  background-color: $forest_green;
+  font-size: 2rem;
+  outline: none;
+  border: none;
+
+  &:hover > a {
+    flex-grow: 1;
+
+    &:hover:before {
+      background-color: $charcoal;
+    }
+  }
+
+  > a {
+    padding: {
+      top: 8px;
+      bottom: 8px;
+    }
+    position: relative;
+    flex-grow: 0;
+    flex-shrink: 1;
+    width: 0;
+    overflow: hidden;
+    @include transition(flex-grow 0.3s);
+
+    &:before {
+      content: '';
+      position: absolute;
+      display: block;
+      height: 4px;
+      background-color: transparent;
+      top: 0;
+      left: 0;
+      width: 100%;
+      @include transition(background-color 0.3s ease);
+    }
+  }
+
+  > a:first-child {
+    flex-grow: 4;
+    flex-shrink: 0;
+  }
+
+  //&-sm {
+  //  @extend .tina-sliding-btn-group;
+  //  font-size: 1.5rem;
+  //  > a {
+  //    padding: 0;
+  //
+  //    &:before {
+  //      height: 2px;
+  //    }
+  //  }
+  //}
+  //
+  //&-lg {
+  //  @extend .tina-sliding-btn-group;
+  //  font-size: 3rem;
+  //  > a {
+  //    padding: {
+  //      top: 16px;
+  //      bottom: 16px;
+  //    }
+  //
+  //    &:before {
+  //      height: 8px;
+  //    }
+  //  }
+  //}
+}
