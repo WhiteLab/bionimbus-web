@@ -1,27 +1,76 @@
 {% extends 'tina/base.html' %}
 {% block content %}
-    <div class="row" style="margin-bottom:50px">
-        <div class="col-sm-8">
-            <span class="tina-header">Viewing {{ project.name }}</span>
+{% load staticfiles %}
+    <div class="row">
+        <div class="tina-project-view-desc">
+          <img class="card-img-top" src={{ MEDIA_URL }}{{ project.project_cover_image.url }} alt="Card image cap">
+          <div class="card-block">
+            <p class="card-text"> Viewing {{ project.name }} </p>
+          </div>
         </div>
     </div>
-    <div class="tina-project-view-desc">
-        {% firstof project.description 'No Description' %}
+    <div class="row">
+      <div class="card">
+        <div class="container" style="text-align: left">
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="card-text"> {% firstof project.description 'No Description' %} </p>
+              <hr class="my-8">
+              <div class="row">
+                <div class="col-6 col-sm-2">
+                  <p class="card-text"> PI </p>
+                </div>
+                <div class="col-6 col-sm-3">
+                  <p class="card-text"> {% firstof project.PI 'None' %} </p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-6 col-sm-2">
+                  <p class="card-text"> Cloud </p>
+                </div>
+                <div class="col-6 col-sm-3">
+                  <p class="card-text"> {% firstof project.cloud 'None' %} </p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-6 col-sm-2">
+                  <p class="card-text"> Organism </p>
+                </div>
+                <div class="col-6 col-sm-3">
+                  <p class="card-text"> {% firstof project.organism 'None' %} </p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-6 col-sm-2">
+                  <p class="card-text"> Platform </p>
+                </div>
+                <div class="col-6 col-sm-3">
+                  <p class="card-text"> {% firstof project.platform 'None' %} </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+
+          <div class="col-6 col-sm-2" style="margin-left:16px" >Subprojects:
+              {% for subproj in project.subprojects %}
+              <div class="row">
+                <div class="col-6 col-sm-2">
+                  <p class="card-text"> {{ subproj.name }} </p>
+                </div>
+              </div>
+              {% empty %}
+                None 
+              {% endfor %}
+          </div><br/>
+        </div>
+        <div > Document details go here </div><br/>
+      </div>
     </div>
-    <div>PI: {% firstof project.PI 'None' %}</div>
-    <div>Cloud: {% firstof project.cloud 'None' %}</div>
-    <div>Organism: {% firstof project.organism 'None' %}</div>
-    <div>Platform: {% firstof project.platform 'None' %}</div>
 
-    <div>Subprojects:
-        {% for subproj in project.subprojects %}
-            {{ subproj.name }}
-        {% empty %}
-            None
-        {% endfor %}
-    </div><br/>
+    <div class="row">
+      <button class="tina-btn" style="margin-top:30px" onclick="window.history.back();">Back</button>
+    </div>
 
-    <div>Document Details go here</div><br/>
-
-    <button class="tina-btn" onclick="window.history.back();">Back</button>
 {% endblock %}
