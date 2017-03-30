@@ -118,16 +118,16 @@ BOWER_COMPONENTS_ROOT = BASE_DIR
 
 BOWER_INSTALLED_APPS = (
     'jquery',
-    'jquery-toast-plugin',
-    'handsontable',
+    'jquery-toast-plugin#1.3.1',
+    'handsontable#0.29.0',
 
-    'bootstrap',
+    'bootstrap#3.3.7',
     'fontawesome',
 
-    'bourbon',
-    'neat',
+    'bourbon#4.3.3',
+    'neat#1.8.0',
 
-    'polymer', 'PolymerElements/iron-icon'
+    'polymer#1.8.1', 'PolymerElements/iron-icon#1.0.12'
 
     # 'bottom-drawer'  # Polymer element
 )

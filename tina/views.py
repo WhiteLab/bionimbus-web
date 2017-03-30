@@ -8,9 +8,10 @@ from django.core import urlresolvers
 from django.contrib import messages
 from django.conf import settings
 
-from models import Project
+from models import Project, SequencingFacility
 from forms import ProjectForm
 from util import resize_project_thumbnail
+import seqfacility
 
 
 # Create your views here.
@@ -105,4 +106,17 @@ def delete_project(request, proj_id):
 
 
 def submit_library(request):
-    return render(request, 'tina/submit/submit.html', {})
+    if request.method == 'POST':
+        facility = request.POST.get('facility_select')
+        # success = seqfacility.handle_submission(facility, dict(zip(request.POST.keys(), request.POST.values())))
+        success = seqfacility.handle_submission(facility, request.POST)
+        print request.POST
+        print 'Success: {}'.format(str(success))
+        # TODO On success or failure, notify user through a message (a toast message)
+        return HttpResponseRedirect(urlresolvers.reverse('home'))
+    else:
+        context = {
+            'projects': Project.objects.all(),
+            'facilities': SequencingFacility.objects.all()
+        }
+        return render(request, 'tina/submit/submit.html', context)

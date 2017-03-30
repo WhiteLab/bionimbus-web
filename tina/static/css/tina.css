@@ -21,11 +21,11 @@ input {
 input[type='text']:focus {
   z-index: 9;
   outline: none;
-  -webkit-transform: scale(1.75);
-  -moz-transform: scale(1.75);
-  -ms-transform: scale(1.75);
-  -o-transform: scale(1.75);
-  transform: scale(1.75);
+  -webkit-transform: scale(1.2);
+  -moz-transform: scale(1.2);
+  -ms-transform: scale(1.2);
+  -o-transform: scale(1.2);
+  transform: scale(1.2);
   box-shadow: 0 0 2px 2px rgba(19, 138, 54, 0.3);
   opacity: 0.8;
 }
@@ -100,11 +100,11 @@ textarea {
 textarea:focus {
   z-index: 9;
   outline: none;
-  -webkit-transform: scale(1.25);
-  -moz-transform: scale(1.25);
-  -ms-transform: scale(1.25);
-  -o-transform: scale(1.25);
-  transform: scale(1.25);
+  -webkit-transform: scale(1.2);
+  -moz-transform: scale(1.2);
+  -ms-transform: scale(1.2);
+  -o-transform: scale(1.2);
+  transform: scale(1.2);
   box-shadow: 0 0 2px 2px rgba(19, 138, 54, 0.3);
   opacity: 0.8;
 }
@@ -132,6 +132,9 @@ select:focus {
   box-shadow: 0 0 2px 2px rgba(19, 138, 54, 0.3);
   opacity: 0.8;
   opacity: 1;
+}
+select:invalid {
+  color: #bbb;
 }
 
 form.neat-form {
@@ -188,6 +191,17 @@ form.bootstrap-form div.col-sm-9 input[type='text'], form.bootstrap-form div.col
 }
 form.bootstrap-form div.col-sm-9 .handsontable {
   width: 60%;
+}
+form.bootstrap-form ul {
+  display: inline-block;
+  padding: 0;
+}
+form.bootstrap-form ul > li {
+  float: left;
+  margin-left: 25px;
+}
+form.bootstrap-form ul > li > label {
+  font-size: 2rem;
 }
 
 html {
@@ -438,7 +452,7 @@ html {
 
 body {
   font-family: 'Open Sans', sans-serif;
-  background-color: #e1e6e1;
+  background-color: #141914;
 }
 
 a {
@@ -446,6 +460,11 @@ a {
 }
 a:link, a:visited {
   color: #333333;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
 }
 
 .tina-header, .tina-header-mid, .tina-header-inline {
@@ -508,7 +527,9 @@ a:link, a:visited {
 }
 
 .tina-content {
-  margin-top: 125px;
+  padding-top: 125px;
+  padding-bottom: 50px;
+  background: #e1e6e1;
 }
 
 .tina-project-view-desc {
@@ -528,6 +549,15 @@ div#projects-matrix::after {
   clear: both;
   content: "";
   display: table;
+}
+
+footer.tina-footer {
+  color: #e1e6e1;
+  margin-top: 50px;
+  height: 100px;
+}
+footer.tina-footer div.row {
+  text-align: center;
 }
 
 /**
@@ -673,6 +703,111 @@ div#projects-matrix::after {
   color: #dff0d8;
   background-color: #3c763d;
   border-color: #d6e9c6;
+}
+
+.radio label,
+.radio-inline label,
+.checkbox label,
+.checkbox-inline label {
+  padding-left: 50px;
+}
+
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="radio"],
+.checkbox-inline input[type="radio"],
+.radio input[type="checkbox"],
+.radio-inline input[type="checkbox"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  margin-left: -50px;
+}
+
+input[type="radio"],
+.radio input[type="radio"],
+.radio-inline input[type="radio"] {
+  position: relative;
+  margin-top: 10px;
+  margin-right: 8px;
+  vertical-align: -8px;
+  border: none;
+  background-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+input[type="radio"]:focus,
+.radio input[type="radio"]:focus,
+.radio-inline input[type="radio"]:focus {
+  outline: none;
+}
+
+input[type="radio"]:before,
+.radio input[type="radio"]:before,
+.radio-inline input[type="radio"]:before,
+input[type="radio"]:after,
+.radio input[type="radio"]:after,
+.radio-inline input[type="radio"]:after {
+  content: "";
+  display: block;
+  width: 36px;
+  height: 36px;
+  margin-top: -6px;
+  border-radius: 50%;
+  -webkit-transition: 240ms;
+  -o-transition: 240ms;
+  transition: 240ms;
+}
+
+input[type="radio"]:before,
+.radio input[type="radio"]:before,
+.radio-inline input[type="radio"]:before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #138a36;
+  -webkit-transform: scale(0);
+  -ms-transform: scale(0);
+  -o-transform: scale(0);
+  transform: scale(0);
+}
+
+input[type="radio"]:after,
+.radio input[type="radio"]:after,
+.radio-inline input[type="radio"]:after {
+  border: 4px solid #666666;
+}
+
+input[type="radio"]:checked:before,
+.radio input[type="radio"]:checked:before,
+.radio-inline input[type="radio"]:checked:before {
+  -webkit-transform: scale(0.5);
+  -ms-transform: scale(0.5);
+  -o-transform: scale(0.5);
+  transform: scale(0.5);
+}
+
+input[type="radio"]:disabled:checked:before,
+.radio input[type="radio"]:disabled:checked:before,
+.radio-inline input[type="radio"]:disabled:checked:before {
+  background-color: rgba(207, 215, 207, 0.8);
+}
+
+input[type="radio"]:checked:after,
+.radio input[type="radio"]:checked:after,
+.radio-inline input[type="radio"]:checked:after {
+  border-color: #138a36;
+  /* Customized #2196f3 -> #003459 */
+}
+
+input[type="radio"]:disabled:after,
+.radio input[type="radio"]:disabled:after,
+.radio-inline input[type="radio"]:disabled:after,
+input[type="radio"]:disabled:checked:after,
+.radio input[type="radio"]:disabled:checked:after,
+.radio-inline input[type="radio"]:disabled:checked:after {
+  border-color: rgba(207, 215, 207, 0.8);
 }
 
 /*# sourceMappingURL=tina.css.map */

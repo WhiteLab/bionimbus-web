@@ -17,8 +17,22 @@ function isValidEntry(entry, colName) {
 }
 
 $(document).ready(function() {
+    $('#facility_select').change(function(){
+        var $facilitySelectSpin = $('#facility-select-spin');
+        $facilitySelectSpin.css('display', 'inline-block');
+        $.get('/seqfacility/{}/'.format($(this).val()), function(data){
+            $('#facility-form-content').empty().append($(data));
+            $facilitySelectSpin.css('display', 'none');
+        });
+        // TODO Report error 500
+    });
+
+    $('#submit-form').submit(function() {
+        $('#samples-sheet').val(JSON.stringify(initData));
+    });
+
     var $submitTable = $('#submit-handsontable'),
-        colHeaders = ['Name', 'Assay', 'Barcode', 'Sequencing Protocol', 'Read Length', 'Platform'],
+        colHeaders = ['Name', 'Barcode'],
         toastCommonOptions = {
             heading: 'Validation Warning',
             bgColor: '#F4D35E',
@@ -26,10 +40,12 @@ $(document).ready(function() {
             position: 'bottom-right',
             hideAfter: 10000,
             loader: false
-        };
+        },
+        initData = [['', ''], ['', ''], ['', ''], ['', ''], ['', '']];
 
     $submitTable.handsontable({
         colHeaders: colHeaders,
+        data: initData,
         stretchH: 'all',
         minSpareRows: 1,
         afterChange: function(changes, source) {

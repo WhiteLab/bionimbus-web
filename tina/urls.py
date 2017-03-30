@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 import views
+import seqfacility
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
@@ -16,5 +17,9 @@ urlpatterns = [
     url(r'^projects/delete/(?P<proj_id>\d+)/$', views.delete_project, name='delete_project'),
 
     # Submit Tab
-    url(r'^submit/$', views.submit_library, name='submit_library')
+    url(r'^submit/$', views.submit_library, name='submit_library'),
+
+    # Sequencing Facility AJAX
+    url(r'^seqfacility/(?P<facility>\w+)/$', seqfacility.get_submit_form,
+        name='seqfacility_get_submit_form')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -36,33 +36,23 @@
     {% block extra_js %}{% endblock %}
 </head>
 <body>
-    <nav class="tina-nav">
-        <span style="font-size:3rem">
-            <a href="/"><span class="fa fa-skyatlas"></span></a>&nbsp;&nbsp;{% strings 'app_name' %}
-        </span>
-        <div class="tina-nav-right">
-            <a href="#"><span class="tina-nav-content">Libraries</span></a>
-            <a href="{% url 'manage_project' %}"><span class="tina-nav-content">Projects</span></a>
-            <a href="{% url 'submit_library' %}"><span class="tina-nav-content">Submit</span></a>
+    <div class="tina-content">
+        <nav class="tina-nav">
+            <span style="font-size:3rem">
+                <a href="/"><span class="fa fa-skyatlas"></span></a>&nbsp;&nbsp;{% strings 'app_name' %}
+            </span>
+            <div class="tina-nav-right">
+                <a href="#"><span class="tina-nav-content">Libraries</span></a>
+                <a href="{% url 'manage_project' %}"><span class="tina-nav-content">Projects</span></a>
+                <a href="{% url 'submit_library' %}"><span class="tina-nav-content">Submit</span></a>
+            </div>
+        </nav>
+        <div class="container">
+            {% block content %}
+            {% endblock content %}
         </div>
-    </nav>
-    <div class="container tina-content">
-        {% block content %}
-        {% endblock content %}
-{#        <div class="row">#}
-{#            <span class="tina-header">Submit a Sample</span>#}
-{#            <p>Using the form below or maybe downloaded, submit a sample for sequencing.</p>#}
-{#        </div>#}
-{#        <div class="row">#}
-{#            <div class="col-sm-6">#}
-{#                <a href="#" class="tina-btn">Submit&nbsp;&nbsp;<span class="fa fa-chevron-right"></span></a>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="row">#}
-{#            <div class="col-sm-6 col-sm-offset-6">#}
-{#                <input type="text"/>#}
-{#            </div>#}
-{#        </div>#}
     </div>
+
+    <footer class="tina-footer">{% include 'tina/footer.html' %}</footer>
 </body>
 </html>
