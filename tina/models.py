@@ -184,6 +184,25 @@ class LibraryBarcode(models.Model):
     pass
 
 
+class SequencingFacility(models.Model):
+    """
+    This model will, I think, be the most important for library submission.
+    """
+    name = models.CharField('Sequencing Facility Name', max_length=1024,
+                            help_text='Name of the sequencing facility.')
+    description = models.TextField('Sequencing Facility Description',
+                                   help_text='Longer description of the sequecing facility.')
+    # TODO Description might be superfluous
+    import_name = models.CharField('Sequencing Core Import Name', max_length=256,
+                                   help_text='Filename of the core blueprint Python file to import.')
+
+    class Meta:
+        verbose_name = 'Sequencing Facility'
+        verbose_name_plural = 'Sequencing Facilities'
+
+
+
+
 class BidKeyGenerator(models.Model):
     year = models.IntegerField('Year', unique=True, default=int(datetime.now().strftime('%Y')))
     increment = models.IntegerField('Increment', default=0)

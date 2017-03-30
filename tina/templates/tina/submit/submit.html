@@ -10,9 +10,33 @@
 {% endblock extra_js %}
 
 {% block content %}
-<div class="row">
-    <div class="col-sm-12">
-        <div id="submit-handsontable" class="handsontable"></div>
+<form class="bootstrap-form" id="submit-form" action="{% url 'submit_library' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="facility_select">Facility:</label>
+        </div>
+        <div class="col-sm-9">
+            <select id="facility_select" name="facility_select">
+                <option value="" disabled selected hidden>Choose a Sequencing Facility</option>
+                {% for facility in facilities %}
+                <option value="{{ facility.import_name }}">{{ facility.name }}</option>
+                {% endfor %}
+            </select>
+            <div id="facility-select-spin" style="display:none">
+                <span class="fa fa-circle-o-notch fa-spin fa-2x" style="margin-left:12px"></span>
+            </div>
+        </div>
     </div>
-</div>
+    <div id="facility-form-content"></div>
+    <div class="row">
+        <div class="col-sm-3">Samples:</div>
+        <div class="col-sm-9">
+            <div id="submit-handsontable" class="handsontable"></div>
+        </div>
+    </div>
+    <input type="hidden" name="samples_sheet" id="samples-sheet" />
+    <button class="tina-btn-lg" id="submit-form-btn">Submit</button>
+</form>
+
 {% endblock content %}

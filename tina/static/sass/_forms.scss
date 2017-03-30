@@ -26,7 +26,7 @@ input {
   @include tina-form;
 
   &[type='text']:focus {
-    @include tina-form-focus(1.75);
+    @include tina-form-focus(1.2);
   }
 
   // Checkboxes
@@ -90,7 +90,7 @@ textarea {
   @include tina-form;
 
   &:focus {
-    @include tina-form-focus(1.25);
+    @include tina-form-focus(1.2);
   }
 }
 
@@ -100,6 +100,10 @@ select {
   &:focus {
     @include tina-form-focus(1);
     opacity: 1;
+  }
+
+  &:invalid {
+    color: #bbb;
   }
 }
 
@@ -147,6 +151,20 @@ form.bootstrap-form {
 
     .handsontable {
       width: 60%;
+    }
+  }
+
+  ul {
+    display: inline-block;
+    padding: 0;
+
+    & > li {
+      float: left;
+      margin-left: 25px;
+
+      & > label {
+        font-size: 2rem;
+      }
     }
   }
 }
