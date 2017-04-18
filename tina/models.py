@@ -3,6 +3,10 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters.html import HtmlFormatter
+from pygments import highlight
+
 
 class Project(models.Model):
     """
@@ -34,6 +38,22 @@ class Project(models.Model):
     details_doc_id = models.CharField('Details Doc Key', max_length=128, editable=False)
 
     project_cover_image = models.ImageField(upload_to='project_covers', blank=True, null=True)
+
+    owner = models.ForeignKey('auth.User', related_name='projects', on_delete=models.CASCADE)
+    highlighted = models.TextField()
+
+    def save(self, *args, **kwargs):
+        """
+        Use the pygments library to create a highlighted HTML
+        representation of the code projects
+        """
+        lexer = get_lexer_by_name(self.language)
+        linenos = self.linenos and 'table' or False
+        options = self.title and {'title': self.title} or {}
+        formatter = HtmlFormatter(style=self.style, linenos=linenos, full = True, **options)
+        self.highlighted = highlight(self.code, lexer, formatter)
+        super(Project, self).save(*args, **kwargs)
+
 
     @staticmethod
     def all_toplevel_projects():
@@ -182,6 +202,25 @@ class Stage(models.Model):
 
 class LibraryBarcode(models.Model):
     pass
+
+
+class SequencingFacility(models.Model):
+    """
+    This model will, I think, be the most important for library submission.
+    """
+    name = models.CharField('Sequencing Facility Name', max_length=1024,
+                            help_text='Name of the sequencing facility.')
+    description = models.TextField('Sequencing Facility Description',
+                                   help_text='Longer description of the sequecing facility.')
+    # TODO Description might be superfluous
+    import_name = models.CharField('Sequencing Core Import Name', max_length=256,
+                                   help_text='Filename of the core blueprint Python file to import.')
+
+    class Meta:
+        verbose_name = 'Sequencing Facility'
+        verbose_name_plural = 'Sequencing Facilities'
+
+
 
 
 class BidKeyGenerator(models.Model):

@@ -12,6 +12,25 @@ from models import Project
 from forms import ProjectForm
 from util import resize_project_thumbnail
 
+from django.contrib.auth.models import User, Group
+from rest_framework import viewsets
+from tina.serializers import UserSerializer, GroupSerializer
+
+# from django.http import HttpResponse, JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+# from rest_framework.renderers import JSONRenderer
+# from rest_framework.parsers import JSONParser
+
+from serializers import ProjectSerializer
+from permissions import IsOwnerOrReadOnly
+from django.http import Http404
+
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework import mixins
+from rest_framework import generics
+from rest_framework import permissions
 
 # Create your views here.
 def home(request):
@@ -36,6 +55,20 @@ def manage_project(request, subproj_id=None):
     }
     return render(request, 'tina/project/manage_project.html', context)
 
+class UserViewSet (viewsets.ModelViewSet):
+    """
+    API end point that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+
+class GroupViewSet (viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited
+    """
+
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 def add_project(request):
     if request.method == 'POST':
@@ -106,3 +139,24 @@ def delete_project(request, proj_id):
 
 def submit_library(request):
     return render(request, 'tina/submit/submit.html', {})
+
+class ProjectList(generics.ListCreateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
+class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
