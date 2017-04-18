@@ -3,9 +3,15 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters.html import HtmlFormatter
-from pygments import highlight
+# from pygments.lexers import get_lexer_by_name
+# from pygments.formatters.html import HtmlFormatter
+# from pygments import highlight
+# from pygments.lexers import get_all_lexers
+# from pygments.styles import get_all_styles
+#
+# LEXERS = [item for item in get_all_lexers() if item[1]]
+# LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
+# STYLE_CHOICES = sorted((item, item) for item in get_all_styles())
 
 
 class Project(models.Model):
@@ -40,18 +46,18 @@ class Project(models.Model):
     project_cover_image = models.ImageField(upload_to='project_covers', blank=True, null=True)
 
     owner = models.ForeignKey('auth.User', related_name='projects', on_delete=models.CASCADE)
-    highlighted = models.TextField()
+    # highlighted = models.TextField()
 
     def save(self, *args, **kwargs):
         """
         Use the pygments library to create a highlighted HTML
         representation of the code projects
         """
-        lexer = get_lexer_by_name(self.language)
-        linenos = self.linenos and 'table' or False
-        options = self.title and {'title': self.title} or {}
-        formatter = HtmlFormatter(style=self.style, linenos=linenos, full = True, **options)
-        self.highlighted = highlight(self.code, lexer, formatter)
+        # lexer = get_lexer_by_name(self.name)
+        # linenos = self.description and 'table' or False
+        # options = self.pi and {'PI': self.pi} or {}
+        # formatter = HtmlFormatter(cloud=self.cloud, linenos=linenos, full = True)
+        # self.highlighted = highlight(self.organism, lexer, formatter)
         super(Project, self).save(*args, **kwargs)
 
 
