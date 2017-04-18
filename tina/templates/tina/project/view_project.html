@@ -2,7 +2,7 @@
 {% block content %}
 {% load staticfiles %}
     <div class="row">
-        <div class="tina-project-view-desc">
+        <div class="tina-project-view-desc" style="text-align: center">
           <img class="card-img-top" src={{ MEDIA_URL }}{{ project.project_cover_image.url }} alt="Card image cap">
           <div class="card-block">
             <p class="card-text"> Viewing {{ project.name }} </p>
@@ -11,7 +11,7 @@
     </div>
     <div class="row">
       <div class="card">
-        <div class="container" style="text-align: left">
+        <div class="container" style="text-align: center">
           <div class="row">
             <div class="col-sm-12">
               <p class="card-text"> {% firstof project.description 'No Description' %} </p>
@@ -61,7 +61,7 @@
                 </div>
               </div>
               {% empty %}
-                None 
+                None
               {% endfor %}
           </div><br/>
         </div>
