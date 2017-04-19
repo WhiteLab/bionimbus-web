@@ -1,5 +1,9 @@
+import json
+import couchdb
 from PIL import Image
 from resizeimage import resizeimage
+
+from django.conf import settings
 
 THUMBNAIL_SIZE = (265, 265)
 
@@ -72,3 +76,17 @@ def generate_html(tag, attrs=None, self_closing=False, content=''):
     )
 
     return tag_template.format(**tag_dict)
+
+
+def format_handson_data(json_str):
+    return dict([m for m in json.loads(json_str) if m[0]])
+
+
+def get_tina_doc(doc_id, include_meta=True):
+    tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
+    if include_meta:
+        return tina_db.get(doc_id)
+    doc = tina_db.get(doc_id)
+    doc.pop('_rev')
+    doc.pop('_id')
+    return doc

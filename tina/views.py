@@ -12,7 +12,7 @@ from django.conf import settings
 
 from models import Project, SequencingFacility
 from forms import ProjectForm
-from util import resize_project_thumbnail
+from util import resize_project_thumbnail, format_handson_data, get_tina_doc
 import seqfacility
 
 
@@ -50,14 +50,14 @@ def add_project(request):
 
             # Resize project cover image into thumbnail
             if project.project_cover_image:
-                image_fullpath = os.path.join(settings.BASE_DIR, project.project_cover_image.url.strip('/'))
-                resize_project_thumbnail(image_fullpath)
+                resize_project_thumbnail(project.project_cover_image.path)
 
             # Create new couchDB document id, put in new metadata
-            other_metadata = [m for m in json.loads(request.POST.get('project_other_metadata', '{}')) if m[0]]
+            # other_metadata = [m for m in json.loads(request.POST.get('project_other_metadata', '{}')) if m[0]]
+            doc_metadata = format_handson_data(request.POST.get('project_other_metadata', '{}'))
             try:
                 tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
-                doc_id, doc_rev = tina_db.save(dict(other_metadata))
+                doc_id, doc_rev = tina_db.save(doc_metadata)
                 project.details_doc_id = doc_id
                 project.save()
             except:
@@ -70,8 +70,10 @@ def add_project(request):
     else:
         project_form = ProjectForm(instance=Project())
         context = {
+            'page_title': 'Add Project',
             'project_form': project_form,
-            'action': 'add'
+            'action': 'add',
+            'existing_doc_metadata': '{}'
         }
         return render(request, 'tina/project/add_edit_project.html', context)
 
@@ -80,21 +82,45 @@ def edit_project(request, proj_id):
     # TODO Resize new thumbnail if given here, and delete old thumbnail
     if request.method == 'POST':
         updated_project = Project.objects.get(pk=proj_id)
+
+        # Get the cover image instance before the updated data is applied to the project instance
+        preupdate_cover_img = updated_project.project_cover_image
+
+        # Apply updated data to the project instance
         updated_project_form = ProjectForm(request.POST, request.FILES, instance=updated_project)
         if updated_project_form.is_valid():
             updated_project_form.save()
+
+            # Check for a cover image change
+            if preupdate_cover_img != updated_project.project_cover_image:
+                # If an old cover image exists, delete it
+                if preupdate_cover_img.name:
+                    os.remove(preupdate_cover_img.path)
+
+                # If a new cover image is uploaded, resize it to a thumbnail
+                if updated_project.project_cover_image.name:
+                    resize_project_thumbnail(updated_project.project_cover_image.path)
+
+            # Send success message to the user
             messages.success(request, 'Project {} was successfully updated.'.format(updated_project.name))
 
-            # TODO All the NoSQL stuff needs to be updated too, probably just create a whole new document
+            # Update the document metadata
+            tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
+            doc = get_tina_doc(updated_project.details_doc_id)
+            doc.update(format_handson_data(request.POST.get('project_other_metadata', '{}')))
+            tina_db.save(doc)
 
             return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
     else:
         project = Project.objects.get(pk=proj_id)
         project_form = ProjectForm(instance=project)
+
         context = {
+            'page_title': 'Edit Project',
             'project_form': project_form,
             'project_pk': project.pk,
-            'action': 'edit'
+            'action': 'edit',
+            'existing_doc_metadata': json.dumps(get_tina_doc(project.details_doc_id, include_meta=False).items())
         }
         return render(request, 'tina/project/add_edit_project.html', context)
 
