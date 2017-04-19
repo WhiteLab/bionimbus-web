@@ -132,6 +132,10 @@ BOWER_INSTALLED_APPS = (
     # 'bottom-drawer'  # Polymer element
 )
 
+# CouchDB Settings
+COUCH_SERVER = local_settings.COUCH_SERVER
+COUCH_TINA_DB = local_settings.COUCH_TINA_DB
+
 # Application wide strings
 STRINGS = {
     'app_name': 'Tina',

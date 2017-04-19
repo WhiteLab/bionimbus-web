@@ -1,7 +1,11 @@
+import os
+import couchdb
 from datetime import datetime
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.conf import settings
 
 
 class Project(models.Model):
@@ -64,6 +68,33 @@ class Project(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+@receiver(models.signals.post_delete, sender=Project)
+def project_cleanup(sender, **kwargs):
+    """
+    Adapted from http://stackoverflow.com/a/16041527/1539628
+    
+    Cleans up after a Project delete by deleting the thumbnail image off 
+    the server and removing any couchdb documents that were created
+    """
+    project = kwargs['instance']
+
+    # Remove thumbnail cover image
+    cover_image = project.project_cover_image
+    if cover_image and os.path.isfile(cover_image.path):
+        os.remove(cover_image.path)
+
+    # Remove couchdb metadata document
+    # TODO The database should be retrieved with a dependency injection
+    tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
+    doc = tina_db.get(project.details_doc_id)
+    try:
+        tina_db.delete(doc)
+    except couchdb.ResourceConflict:
+        pass
+
+
 
 
 class LibraryDocumentDefaultKey(models.Model):

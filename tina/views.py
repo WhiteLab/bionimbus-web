@@ -1,6 +1,8 @@
 import os
 import json
 
+import couchdb
+
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.context_processors import csrf
@@ -42,19 +44,27 @@ def add_project(request):
     if request.method == 'POST':
         project_form = ProjectForm(request.POST, request.FILES, instance=Project())
         if project_form.is_valid():
-            # Create the new Project model
+            # Create the new Project model, send success message
             project = project_form.save()
             messages.success(request, 'Project {} was successfully created.'.format(project.name))
 
             # Resize project cover image into thumbnail
-            image_fullpath = os.path.join(settings.BASE_DIR, project.project_cover_image.url.strip('/'))
-            resize_project_thumbnail(image_fullpath)
+            if project.project_cover_image:
+                image_fullpath = os.path.join(settings.BASE_DIR, project.project_cover_image.url.strip('/'))
+                resize_project_thumbnail(image_fullpath)
 
             # Create new couchDB document id, put in new metadata
-            # TODO Send message that metadata could not be saved
             other_metadata = [m for m in json.loads(request.POST.get('project_other_metadata', '{}')) if m[0]]
+            try:
+                tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
+                doc_id, doc_rev = tina_db.save(dict(other_metadata))
+                project.details_doc_id = doc_id
+                project.save()
+            except:
+                # TODO Jquery Toast is acting funky if more than one message is sent
+                messages.error(request, 'Metadata document could not be established')
+
             library_defaults = [m for m in json.loads(request.POST.get('project_other_metadata', '{}')) if m[0]]
-            print other_metadata
 
         return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
     else:
@@ -67,6 +77,7 @@ def add_project(request):
 
 
 def edit_project(request, proj_id):
+    # TODO Resize new thumbnail if given here, and delete old thumbnail
     if request.method == 'POST':
         updated_project = Project.objects.get(pk=proj_id)
         updated_project_form = ProjectForm(request.POST, request.FILES, instance=updated_project)
