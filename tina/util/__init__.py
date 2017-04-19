@@ -78,15 +78,32 @@ def generate_html(tag, attrs=None, self_closing=False, content=''):
     return tag_template.format(**tag_dict)
 
 
-def format_handson_data(json_str):
-    return dict([m for m in json.loads(json_str) if m[0]])
+class TinaCouchDB:
+    @staticmethod
+    def format_handson_data(json_str):
+        return dict([m for m in json.loads(json_str) if m[0]])
 
+    @staticmethod
+    def _get_tina_db():
+        return couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
 
-def get_tina_doc(doc_id, include_meta=True):
-    tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
-    if include_meta:
-        return tina_db.get(doc_id)
-    doc = tina_db.get(doc_id)
-    doc.pop('_rev')
-    doc.pop('_id')
-    return doc
+    @staticmethod
+    def get_tina_doc(doc_id, include_meta=True):
+        tina_db = TinaCouchDB._get_tina_db()
+        if include_meta:
+            return tina_db.get(doc_id)
+        doc = tina_db.get(doc_id)
+        doc.pop('_rev')
+        doc.pop('_id')
+        return doc
+
+    @staticmethod
+    def save_tina_doc(doc_body):
+        return TinaCouchDB._get_tina_db().save(doc_body)
+
+    @staticmethod
+    def update_tina_doc(doc_id, update_doc_body):
+        tina_db = TinaCouchDB._get_tina_db()
+        doc = TinaCouchDB.get_tina_doc(doc_id)
+        doc.update(update_doc_body)
+        tina_db.save(doc)

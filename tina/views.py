@@ -12,7 +12,7 @@ from django.conf import settings
 
 from models import Project, SequencingFacility
 from forms import ProjectForm
-from util import resize_project_thumbnail, format_handson_data, get_tina_doc
+from util import resize_project_thumbnail, TinaCouchDB
 import seqfacility
 
 
@@ -54,11 +54,9 @@ def add_project(request):
 
             # Create new couchDB document id, put in new metadata
             # other_metadata = [m for m in json.loads(request.POST.get('project_other_metadata', '{}')) if m[0]]
-            doc_metadata = format_handson_data(request.POST.get('project_other_metadata', '{}'))
+            doc_metadata = TinaCouchDB.format_handson_data(request.POST.get('project_other_metadata', '{}'))
             try:
-                tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
-                doc_id, doc_rev = tina_db.save(doc_metadata)
-                project.details_doc_id = doc_id
+                project.details_doc_id, _ = TinaCouchDB.save_tina_doc(doc_metadata)
                 project.save()
             except:
                 # TODO Jquery Toast is acting funky if more than one message is sent
@@ -105,10 +103,8 @@ def edit_project(request, proj_id):
             messages.success(request, 'Project {} was successfully updated.'.format(updated_project.name))
 
             # Update the document metadata
-            tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
-            doc = get_tina_doc(updated_project.details_doc_id)
-            doc.update(format_handson_data(request.POST.get('project_other_metadata', '{}')))
-            tina_db.save(doc)
+            update_doc_body = TinaCouchDB.format_handson_data(request.POST.get('project_other_metadata', '{}'))
+            TinaCouchDB.update_tina_doc(updated_project.details_doc_id, update_doc_body)
 
             return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
     else:
@@ -120,7 +116,9 @@ def edit_project(request, proj_id):
             'project_form': project_form,
             'project_pk': project.pk,
             'action': 'edit',
-            'existing_doc_metadata': json.dumps(get_tina_doc(project.details_doc_id, include_meta=False).items())
+            'existing_doc_metadata': json.dumps(
+                TinaCouchDB.get_tina_doc(project.details_doc_id, include_meta=False).items()
+            )
         }
         return render(request, 'tina/project/add_edit_project.html', context)
 
