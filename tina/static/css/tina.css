@@ -525,6 +525,12 @@ ul {
   line-height: 100px;
   display: block;
 }
+.tina-nav > span.tina-nav-brand {
+  font-size: 3rem;
+}
+.tina-nav > span.tina-nav-brand img {
+  max-height: 60%;
+}
 
 .tina-content {
   padding-top: 125px;

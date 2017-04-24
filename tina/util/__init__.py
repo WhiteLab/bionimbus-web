@@ -79,16 +79,30 @@ def generate_html(tag, attrs=None, self_closing=False, content=''):
 
 
 class TinaCouchDB:
+    """
+    Utility methods are dealing with the documents in the Tina CouchDB database.
+    """
     @staticmethod
     def format_handson_data(json_str):
+        """
+        Converts a JSON string to a Python dictionary. This JSON object will a bunch of 
+        key-value pairs. If the key field is blank, that entry is discarded.
+        """
         return dict([m for m in json.loads(json_str) if m[0]])
 
     @staticmethod
     def _get_tina_db():
+        """
+        Returns the Tina CouchDB database as configured in settings.py.
+        """
         return couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
 
     @staticmethod
     def get_tina_doc(doc_id, include_meta=True):
+        """
+        Retrieves the document with _id corresponding to doc_id. If include_meta is 
+        False, the _rev and _id fields will be removed, leaving only the document body.
+        """
         tina_db = TinaCouchDB._get_tina_db()
         if include_meta:
             return tina_db.get(doc_id)
@@ -99,11 +113,32 @@ class TinaCouchDB:
 
     @staticmethod
     def save_tina_doc(doc_body):
+        """
+        Given a Python dictionary object or something similar, will save the document to 
+        the Tina CouchDB database as configured in settings.py.
+        """
         return TinaCouchDB._get_tina_db().save(doc_body)
 
     @staticmethod
     def update_tina_doc(doc_id, update_doc_body):
+        """
+        Updates the document with _id corresponding to doc_id. Any keys not present will be 
+        added, any keys present will have values overwritten, and keys that aren't in the 
+        updated dictionary will be removed from the document.
+        """
         tina_db = TinaCouchDB._get_tina_db()
-        doc = TinaCouchDB.get_tina_doc(doc_id)
-        doc.update(update_doc_body)
-        tina_db.save(doc)
+        old_doc = TinaCouchDB.get_tina_doc(doc_id)
+        new_doc = couchdb.Document({'_id': old_doc['_id'], '_rev': old_doc['_rev']})
+        new_doc.update(update_doc_body)
+        tina_db.save(new_doc)
+
+    @staticmethod
+    def delete_tina_doc(doc_id):
+        """
+        Deletes the document with _id corresponding to doc_id.
+        """
+        tina_db = TinaCouchDB._get_tina_db()
+        try:
+            tina_db.delete(TinaCouchDB.get_tina_doc(doc_id))
+        except couchdb.ResourceConflict:
+            raise

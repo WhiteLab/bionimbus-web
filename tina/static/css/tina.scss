@@ -104,6 +104,14 @@ ul {
       }
     }
   }
+
+  & > span.tina-nav-brand {
+    font-size: 3rem;
+
+    img {
+      max-height: 60%;
+    }
+  }
 }
 
 .tina-content {

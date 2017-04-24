@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.conf import settings
 
+from util import TinaCouchDB
+
 
 class Project(models.Model):
     """
@@ -86,11 +88,8 @@ def project_cleanup(sender, **kwargs):
         os.remove(cover_image.path)
 
     # Remove couchdb metadata document
-    # TODO The database should be retrieved with a dependency injection
-    tina_db = couchdb.Server(settings.COUCH_SERVER)[settings.COUCH_TINA_DB]
-    doc = tina_db.get(project.details_doc_id)
     try:
-        tina_db.delete(doc)
+        TinaCouchDB.delete_tina_doc(project.details_doc_id)
     except couchdb.ResourceConflict:
         pass
 

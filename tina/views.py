@@ -53,7 +53,6 @@ def add_project(request):
                 resize_project_thumbnail(project.project_cover_image.path)
 
             # Create new couchDB document id, put in new metadata
-            # other_metadata = [m for m in json.loads(request.POST.get('project_other_metadata', '{}')) if m[0]]
             doc_metadata = TinaCouchDB.format_handson_data(request.POST.get('project_other_metadata', '{}'))
             try:
                 project.details_doc_id, _ = TinaCouchDB.save_tina_doc(doc_metadata)
@@ -77,7 +76,6 @@ def add_project(request):
 
 
 def edit_project(request, proj_id):
-    # TODO Resize new thumbnail if given here, and delete old thumbnail
     if request.method == 'POST':
         updated_project = Project.objects.get(pk=proj_id)
 
@@ -116,6 +114,7 @@ def edit_project(request, proj_id):
             'project_form': project_form,
             'project_pk': project.pk,
             'action': 'edit',
+            # The metadata in CouchDB so that it can be populated in the appropriate field
             'existing_doc_metadata': json.dumps(
                 TinaCouchDB.get_tina_doc(project.details_doc_id, include_meta=False).items()
             )
@@ -131,11 +130,19 @@ def view_project(request, proj_id):
 
 
 def delete_project(request, proj_id):
-    # Delete Project, return message to user on success
     project = Project.objects.get(pk=proj_id)
     project_name = project.name
-    project.delete()
-    messages.success(request, 'Project {} and all its contents were deleted.'.format(project_name))
+
+    # Attempt to delete the Project
+    try:
+        # Project delete has a signal receiver attached to it in models.py
+        project.delete()
+
+        # Send successful delete message to the user
+        messages.success(request, 'Project {} and all its contents were deleted.'.format(project_name))
+    except:
+        # Send error message to the user
+        messages.error(request, 'There was an error deleting project {}'.format(project_name))
 
     return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
 
