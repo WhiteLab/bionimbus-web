@@ -1,16 +1,17 @@
 {% extends 'tina/base.html' %}
 {% load staticfiles %}
 
-{% block extended_title %} | Add Project{% endblock %}
+{% block extended_title %} | {{ page_title }}{% endblock %}
 
 {% block extra_js %}
+<script>var docMetadata = {{ existing_doc_metadata | safe }};</script>
 <script src="{% static 'js/project/add_project.js' %}"></script>
 {% endblock extra_js %}
 
 {% block content %}
     <div class="row" style="margin-bottom:50px">
         <div class="col-sm-8">
-            <span class="tina-header">Add Project</span>
+            <span class="tina-header">{{ page_title }}</span>
         </div>
     </div>
     <form class="bootstrap-form" action="{% if action == 'add' %}{% url 'add_project' %}{% else %}{% url 'edit_project' project_pk %}{% endif %}" method="post"  enctype="multipart/form-data" style="margin-bottom:50px">
