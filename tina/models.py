@@ -34,7 +34,7 @@ class Project(models.Model):
 
     project_cover_image = models.ImageField(upload_to='project_covers', blank=True, null=True)
 
-    # needed
+    # Which user created the project
     owner = models.ForeignKey('auth.User', related_name='projects', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
@@ -42,11 +42,6 @@ class Project(models.Model):
         Use the pygments library to create a highlighted HTML
         representation of the code projects
         """
-        # lexer = get_lexer_by_name(self.name)
-        # linenos = self.description and 'table' or False
-        # options = self.pi and {'PI': self.pi} or {}
-        # formatter = HtmlFormatter(cloud=self.cloud, linenos=linenos, full = True)
-        # self.highlighted = highlight(self.organism, lexer, formatter)
         super(Project, self).save(*args, **kwargs)
 
 
