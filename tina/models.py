@@ -6,8 +6,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 
 from util import TinaCouchDB
+
+
+class UserProfile(models.Model):
+    defaults_doc_id = models.CharField('Defaults Doc ID', max_length=128, editable=False)
 
 
 class Project(models.Model):
