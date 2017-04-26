@@ -42,10 +42,10 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^projects/list/$', views.project_list),
     # url(r'^projects/get/(?P<pk>[0-9]+)$', views.project_detail),
-    url(r'^projects/list/$', views.ProjectList.as_view()),
-    url(r'^projects/get/(?P<pk>[0-9]+)$', views.ProjectDetail.as_view()),
-    url(r'^users/$', views.UserList.as_view()),
-    url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
+    url(r'^projects/list/$', views.ProjectList.as_view(), name='project-list'),
+    url(r'^projects/get/(?P<pk>[0-9]+)$', views.ProjectDetail.as_view(), name='project-detail'),
+    url(r'^users/$', views.UserList.as_view(), name='user_list'),
+    url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view(), name='get_user'),
 
     # Submit Tab
     url(r'^submit/$', views.submit_library, name='submit_library')

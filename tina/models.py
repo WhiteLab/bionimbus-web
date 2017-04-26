@@ -3,11 +3,6 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters.html import HtmlFormatter
-from pygments import highlight
-
-
 class Project(models.Model):
     """
     Represents a project, such as PsychENCODE or Chicago Pancreatic Cancer Initiative
@@ -39,19 +34,19 @@ class Project(models.Model):
 
     project_cover_image = models.ImageField(upload_to='project_covers', blank=True, null=True)
 
+    # needed
     owner = models.ForeignKey('auth.User', related_name='projects', on_delete=models.CASCADE)
-    highlighted = models.TextField()
 
     def save(self, *args, **kwargs):
         """
         Use the pygments library to create a highlighted HTML
         representation of the code projects
         """
-        lexer = get_lexer_by_name(self.language)
-        linenos = self.linenos and 'table' or False
-        options = self.title and {'title': self.title} or {}
-        formatter = HtmlFormatter(style=self.style, linenos=linenos, full = True, **options)
-        self.highlighted = highlight(self.code, lexer, formatter)
+        # lexer = get_lexer_by_name(self.name)
+        # linenos = self.description and 'table' or False
+        # options = self.pi and {'PI': self.pi} or {}
+        # formatter = HtmlFormatter(cloud=self.cloud, linenos=linenos, full = True)
+        # self.highlighted = highlight(self.organism, lexer, formatter)
         super(Project, self).save(*args, **kwargs)
 
 
@@ -89,12 +84,6 @@ class Project(models.Model):
 class LibraryDocumentDefaultKey(models.Model):
     project = models.ForeignKey('Project')
     key = models.CharField(max_length=1024)
-
-
-
-
-
-
 
 
 class Biospecimen(models.Model):

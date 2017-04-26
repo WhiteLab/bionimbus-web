@@ -7,4 +7,4 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ('name', 'description', 'project_cover_image', 'pi',
                   'public', 'cloud', 'organism', 'platform',
-                  'parent_project')
+                  'parent_project', 'owner')
