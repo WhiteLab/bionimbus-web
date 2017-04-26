@@ -143,6 +143,9 @@ def delete_project(request, proj_id):
 def submit_library(request):
     return render(request, 'tina/submit/submit.html', {})
 
+
+# restful API 
+
 class ProjectList(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
