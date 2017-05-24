@@ -32,6 +32,7 @@ ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 # Application definition
 
 INSTALLED_APPS = (
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -133,11 +134,16 @@ BOWER_INSTALLED_APPS = (
 )
 
 # CouchDB Settings
-COUCH_SERVER = local_settings.COUCH_SERVER
-COUCH_TINA_DB = local_settings.COUCH_TINA_DB
+#COUCH_SERVER = local_settings.COUCH_SERVER
+#COUCH_TINA_DB = local_settings.COUCH_TINA_DB
 
 # Application wide strings
 STRINGS = {
     'app_name': 'Tina',
     'installed_app_name': 'tina'
+}
+
+# limit amount of instances returned in the browsable api
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 10
 }
