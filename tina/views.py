@@ -16,24 +16,6 @@ from forms import ProjectForm
 from util import resize_project_thumbnail, TinaCouchDB
 import seqfacility
 
-from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
-from tina.serializers import UserSerializer, GroupSerializer
-
-from serializers import ProjectSerializer
-from permissions import IsOwnerOrReadOnly
-from django.http import Http404
-
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework import mixins
-from rest_framework import generics
-from rest_framework import permissions
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
-
 
 class ProjectViews:
     class Manage(View):
@@ -180,57 +162,3 @@ class SubmitViews:
                 'facilities': SequencingFacility.objects.all()
             }
             return render(request, 'tina/submit/submit.html', context)
-
-
-# Using generic class-based views
-
-# http http://127.0.0.1:8000/projects/list/
-
-class ProjectList(generics.ListCreateAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
-
-
-class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
-
-
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API end point that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited
-    """
-
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'projects': reverse('project-list', request=request, format=format)
-    })
