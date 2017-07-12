@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 from util import TinaCouchDB
+from tina.mixins import ProjectDescendantMixin
 
 
 class UserProfile(models.Model):
@@ -53,19 +54,32 @@ class Project(models.Model):
         """
         return Project.objects.filter(parent_project=None)
 
+    def project(self, root=False):
+        if not root or not self.is_subproject():
+            return self
+        return self.parent_project.project(root)
+
+
     def is_subproject(self):
         """
         Return whether this Project is a subproject
         """
-        if self.parent_project is not None:
-            return True
-        return False
+        return self.parent_project is not None
 
     def subprojects(self):
         """
         Get all of this Projects subprojects
         """
         return Project.objects.filter(parent_project=self.pk)
+
+    def lineage(self, strings=False, include_self=True):
+        """
+        Get all of this Project's parent projects
+        """
+        self_lineage = [self.name if strings else self] if include_self else list()
+        if self.is_subproject():
+            return self.parent_project.lineage(strings, include_self) + self_lineage
+        return self_lineage
 
     def libraries(self, include_subprojects=False):
         """
@@ -74,7 +88,12 @@ class Project(models.Model):
         pass
 
     def __unicode__(self):
-        return self.name
+        if not self.is_subproject():
+            return self.name
+        return '::'.join((str(self.parent_project), self.name))
+
+    def __str__(self):
+        return self.__unicode__()
 
 
 @receiver(models.signals.post_delete, sender=Project)
@@ -99,36 +118,25 @@ def project_cleanup(sender, **kwargs):
         pass
 
 
-
-
 class LibraryDocumentDefaultKey(models.Model):
     project = models.ForeignKey('Project')
     key = models.CharField(max_length=1024)
 
 
-
-
-
-
-
-
-class Biospecimen(models.Model):
+class Biospecimen(ProjectDescendantMixin, models.Model):
     """
     Represents an individual biological organism from which a sample was derived, such as a patient.
     """
     name = models.CharField('Biospecimen Name', max_length=1024)
-    project = models.ForeignKey('Project')
+    parent_model = models.ForeignKey('Project', verbose_name='Project')
 
 
-class Sample(models.Model):
+class Sample(ProjectDescendantMixin, models.Model):
     """
     Represents a biological sample which was taken from a biospecimen.
     """
     name = models.CharField('Sample Name', max_length=1024)
-    biospecimen = models.ForeignKey('Biospecimen')
-
-    def project(self):
-        return self.biospecimen.project
+    parent_model = models.ForeignKey('Biospecimen', verbose_name='Biospecimen')
 
 
 class ProjectPerLibraryDetail(models.Model):
@@ -136,13 +144,16 @@ class ProjectPerLibraryDetail(models.Model):
     project = models.ForeignKey('Project')
 
 
-class Library(models.Model):
+class Library(ProjectDescendantMixin, models.Model):
     """
     Represents a library of reads which were generated from a sample.
 
     Libraries are the model of primary interest when looking at a Project, but the relationship must
     go through a Sample which must go through a Biospecimen.
     """
+    class Meta:
+        verbose_name_plural = 'Libraries'
+
     class State:
         """
         Represents the current state of a library, mostly related to its sequencing and data
@@ -150,12 +161,9 @@ class Library(models.Model):
         string.
         """
         ALL = 'submitted sequencing available'.split()
+        STATE_CHOICES = [(choice, choice.capitalize()) for choice in ALL]
 
-        @classmethod
-        def choices(cls):
-            return [(choice, choice.capitalize()) for choice in cls.ALL]
-
-    name = models.CharField('Library Name', max_length=1024)
+    name = models.CharField('Library BID', max_length=1024)
     assay = models.CharField('Library Assay', max_length=1024)  # TODO How to set default to library default?
     barcode = models.ForeignKey('LibraryBarcode')
     sequencing_protocol = models.CharField('Library Sequencing Protocol', max_length=2, choices=(
@@ -173,16 +181,86 @@ class Library(models.Model):
 
 
     # Programmatic entry fields
-    bionimbus_id = models.CharField('Library BID', max_length=16)
-    state = models.CharField('Library State', max_length=128, default='submitted', choices=State.choices())
+    # bionimbus_id = models.CharField('Library BID', max_length=16)
+    state = models.CharField('Library State', max_length=128, default='submitted', choices=State.STATE_CHOICES)
 
     details_doc_id = models.CharField('Detail Doc Key', max_length=128, editable=False)  # TODO Should this be JSON?
 
-    sample = models.ForeignKey('Sample', blank=True, null=True)
+    parent_model = models.ForeignKey('Sample', verbose_name='Sample', blank=True, null=True)
 
-    def project(self):
-        return self.sample.biospecimen.project
 
+class LibraryData(models.Model):
+    """
+    Represents an individual data file of a Library, most commonly in fastq format
+    """
+    class Meta:
+        verbose_name_plural = 'Library Data'
+
+    class Phred:
+        SANGER_33 = 0
+        SOLEXA_64 = 1
+        ILLUMINA_1POINT3_64 = 2
+        ILLUMINA_1POINT5_64 = 3
+        ILLUMINA_1POINT8_33 = 4
+        OTHER = 5
+
+        PHRED_CHOICES = (
+            (SANGER_33, 'Sanger +33'),
+            (SOLEXA_64, 'Solexa +64'),
+            (ILLUMINA_1POINT3_64, 'Illumina 1.3 +64'),
+            (ILLUMINA_1POINT5_64, 'Illumina 1.5 +64'),
+            (ILLUMINA_1POINT8_33, 'Illumina 1.8 +33'),
+            (OTHER, 'Other')
+        )
+
+    class DataFormat:
+        FASTQ = 0
+        FASTA = 1
+        SAM = 2
+        BAM = 3
+        GFF_GTF = 4
+        BED = 5
+        VCF = 6
+        OTHER = 7
+
+        FORMAT_CHOICES = (
+            (FASTQ, 'Fastq'),
+            (FASTA, 'Fasta'),
+            (SAM, 'SAM'),
+            (BAM, 'BAM'),
+            (GFF_GTF, 'GFF/GTF'),
+            (BED, 'BED'),
+            (VCF, 'VCF'),
+            (OTHER, 'Other'),
+        )
+
+    library = models.ForeignKey('Library')
+    path = models.FilePathField('Library Data Path', path=settings.LIBRARY_DATA_ROOT, recursive=True, max_length=512)
+    format = models.IntegerField('Library Data Format', choices=DataFormat.FORMAT_CHOICES,
+                                 default=DataFormat.FASTQ, blank=True, null=True)
+    paired_end_mate = models.OneToOneField('LibraryData', on_delete=models.SET_NULL, blank=True, null=True)
+    number_of_reads = models.BigIntegerField('Library Data Number of Reads', blank=True, null=True)
+    phred_scale = models.IntegerField('Library Data Phred Quality Scale', choices=Phred.PHRED_CHOICES,
+                                      default=Phred.ILLUMINA_1POINT8_33, blank=True, null=True)
+    read_length = models.IntegerField('Library Data Read Length', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        """
+        Override of the save() method to allow a symmetric OneToOneField for paired
+        end mates. When one LibraryData sets another as its paired end mate, the other
+        LibraryData's paired end mate is also set in a symmetric fashion.
+        """
+        super(LibraryData, self).save()
+
+        if self.paired_end_mate and self.paired_end_mate.paired_end_mate is not self:
+            self.paired_end_mate.paired_end_mate = self
+            self.paired_end_mate.save()
+
+    def __unicode__(self):
+        return self.path.replace(settings.LIBRARY_DATA_ROOT + '/', '')
+
+    def __str__(self):
+        return self.__unicode__()
 
 
 class Organism(models.Model):

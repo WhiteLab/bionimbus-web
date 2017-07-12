@@ -1,5 +1,6 @@
 import os
 import json
+import importlib
 
 import couchdb
 
@@ -10,14 +11,17 @@ from django.core import urlresolvers
 from django.contrib import messages
 from django.conf import settings
 from django.views.generic import View
+from django.contrib.auth.decorators import login_required
 
-from models import Project, SequencingFacility
+from models import Project, SequencingFacility, Library
 from forms import ProjectForm
 from util import resize_project_thumbnail, TinaCouchDB
 import seqfacility
+import downloader
+from downloader.local import LocalDownloader
 
 
-class ProjectViews:
+class ProjectViews(object):
     class Manage(View):
         def get(self, request, subproj_id=None):
             if subproj_id is not None:
@@ -145,7 +149,7 @@ class ProjectViews:
             return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
 
 
-class SubmitViews:
+class SubmitViews(object):
     class SubmitLibrary(View):
         def post(self, request):
             facility = request.POST.get('facility_select')
@@ -162,3 +166,58 @@ class SubmitViews:
                 'facilities': SequencingFacility.objects.all()
             }
             return render(request, 'tina/submit/submit.html', context)
+
+
+class CartViews(object):
+    class AddToCart(View):
+        def get(self, request, library_id):
+            if 'cart' not in request.session or not request.session['cart']:
+                request.session['cart'] = list()
+            if int(library_id) not in request.session['cart']:
+                request.session['cart'].append(int(library_id))
+                request.session.modified = True
+            return HttpResponseRedirect('/cart')
+
+    class ClearCart(View):
+        @staticmethod
+        def get(request):
+            if 'cart' in request.session:
+                request.session['cart'] = list()
+            return HttpResponseRedirect('/cart')
+
+        @classmethod
+        def clear(cls, request):
+            return cls.get(request)
+
+    class HandleDownloadRequest(View):
+        def post(self, request):
+            """
+            There will actually be a lot of logic here to select the correct
+            downloader to pass to
+            """
+            library_ids_to_download = request.session['cart']
+            downloader_class = getattr(importlib.import_module('tina.downloader.local'), request.POST['downloader'])
+            # CartViews.ClearCart.clear(request)
+            print library_ids_to_download
+            paths_to_compress = list()
+            for library_id in library_ids_to_download:
+                if library_id == 1:
+                    paths_to_compress.append('/home/dfitzgerald/workspace/PycharmProjects/tina/data/test1.fastq')
+                elif library_id == 2:
+                    paths_to_compress.append('/home/dfitzgerald/workspace/PycharmProjects/tina/data/test2.fastq')
+                elif library_id == 3:
+                    paths_to_compress.append('/home/dfitzgerald/workspace/PycharmProjects/tina/data/test3.fastq')
+
+            compressed_payload_path = downloader.create_compressed_payload(paths_to_compress)
+            print compressed_payload_path
+            template, context = downloader_class.process(compressed_payload_path)
+            print template
+            print context
+            return render(request, template, context)
+
+            return HttpResponseRedirect('/cart')
+            # Need to get list of libraries from session, convert those into paths for bundling
+            # compressed_payload_path = downloader.create_compressed_payload(None)
+            # template, context = LocalDownloader.process('/media/downloads/test1.fastq')
+            # template, context = LocalDownloader.process(compressed_payload_path)
+

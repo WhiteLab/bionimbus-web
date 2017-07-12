@@ -39,7 +39,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djangobower',
-    'tina'
+    'tina',
+    'shibboleth'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -47,6 +48,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -80,6 +82,22 @@ STATICFILES_FINDERS = [
     'djangobower.finders.BowerFinder'
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'shibboleth.backends.ShibbolethRemoteUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# SHIBBOLETH_ATTRIBUTE_MAP = {
+#     'shib-user': (True, "username"),
+#     'shib-given-name': (True, "first_name"),
+#     'shib-sn': (True, "last_name"),
+#     'shib-mail': (False, "email"),
+# }
+
+SHIBBOLETH_ATTRIBUTE_MAP = {
+    'name': (True, 'username')
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -111,7 +129,8 @@ STATIC_ROOT = STATIC_PATH
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-LOGIN_URL = '/login/'
+# LOGIN_URL = '/login/'
+LOGIN_URL = 'https://igsbconferences.uchicago.edu/Shibboleth.sso/Login'
 
 # Bower Django settings
 BOWER_COMPONENTS_ROOT = BASE_DIR
@@ -135,6 +154,9 @@ BOWER_INSTALLED_APPS = (
 # CouchDB Settings
 COUCH_SERVER = local_settings.COUCH_SERVER
 COUCH_TINA_DB = local_settings.COUCH_TINA_DB
+
+# Root directory where library fastqs will be stored
+LIBRARY_DATA_ROOT = local_settings.LIBRARY_DATA_ROOT
 
 # Application wide strings
 STRINGS = {
