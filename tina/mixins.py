@@ -14,8 +14,9 @@ class ProjectDescendantMixin(object):
     def project(self, root=False):
         return self.parent_model.project(root)
 
-    def lineage(self, strings=False):
-        return [self.parent_model.lineage(strings), self.name if strings else self]
+    def lineage(self, strings=False, return_tuple=True):
+        lineage_as_list = self.parent_model.lineage(strings=strings, return_tuple=False) + [self.name if strings else self]
+        return tuple(lineage_as_list) if return_tuple else lineage_as_list
 
     def __unicode__(self):
         return '__'.join((str(self.parent_model), self.name))

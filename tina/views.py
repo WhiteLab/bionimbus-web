@@ -17,8 +17,7 @@ from models import Project, SequencingFacility, Library
 from forms import ProjectForm
 from util import resize_project_thumbnail, TinaCouchDB
 import seqfacility
-import downloader
-from downloader.local import LocalDownloader
+from downloaders.util import create_bundle
 
 
 class ProjectViews(object):
@@ -196,28 +195,11 @@ class CartViews(object):
             downloader to pass to
             """
             library_ids_to_download = request.session['cart']
-            downloader_class = getattr(importlib.import_module('tina.downloader.local'), request.POST['downloader'])
+            downloader_module, downloader_class = request.POST['downloader'].rsplit('.', 1)
+            downloader = getattr(importlib.import_module(downloader_module), downloader_class)
             # CartViews.ClearCart.clear(request)
-            print library_ids_to_download
-            paths_to_compress = list()
-            for library_id in library_ids_to_download:
-                if library_id == 1:
-                    paths_to_compress.append('/home/dfitzgerald/workspace/PycharmProjects/tina/data/test1.fastq')
-                elif library_id == 2:
-                    paths_to_compress.append('/home/dfitzgerald/workspace/PycharmProjects/tina/data/test2.fastq')
-                elif library_id == 3:
-                    paths_to_compress.append('/home/dfitzgerald/workspace/PycharmProjects/tina/data/test3.fastq')
 
-            compressed_payload_path = downloader.create_compressed_payload(paths_to_compress)
-            print compressed_payload_path
-            template, context = downloader_class.process(compressed_payload_path)
-            print template
-            print context
+            bundle_path = create_bundle(Library.objects.filter(pk__in=library_ids_to_download))
+            template, context = downloader.process(bundle_path)
             return render(request, template, context)
-
-            return HttpResponseRedirect('/cart')
-            # Need to get list of libraries from session, convert those into paths for bundling
-            # compressed_payload_path = downloader.create_compressed_payload(None)
-            # template, context = LocalDownloader.process('/media/downloads/test1.fastq')
-            # template, context = LocalDownloader.process(compressed_payload_path)
 

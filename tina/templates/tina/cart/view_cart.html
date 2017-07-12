@@ -11,7 +11,7 @@
 <p>
     <form action="/cart/download/" method="post">
         {% csrf_token %}
-        <input type="hidden" name="downloader" value="LocalDownloader" />
+        <input type="hidden" name="downloader" value="tina.downloaders.local.LocalDownloader" />
         <button type="submit">Create Download Request</button>
     </form>
 </p>

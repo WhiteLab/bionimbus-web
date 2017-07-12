@@ -72,14 +72,14 @@ class Project(models.Model):
         """
         return Project.objects.filter(parent_project=self.pk)
 
-    def lineage(self, strings=False, include_self=True):
+    def lineage(self, strings=False, include_self=True, return_tuple=False):
         """
         Get all of this Project's parent projects
         """
         self_lineage = [self.name if strings else self] if include_self else list()
         if self.is_subproject():
             return self.parent_project.lineage(strings, include_self) + self_lineage
-        return self_lineage
+        return tuple(self_lineage) if return_tuple else self_lineage
 
     def libraries(self, include_subprojects=False):
         """
@@ -257,7 +257,7 @@ class LibraryData(models.Model):
             self.paired_end_mate.save()
 
     def __unicode__(self):
-        return self.path.replace(settings.LIBRARY_DATA_ROOT + '/', '')
+        return '__'.join((self.library.name, self.path.replace(settings.LIBRARY_DATA_ROOT + '/', '')))
 
     def __str__(self):
         return self.__unicode__()
