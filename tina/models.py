@@ -301,6 +301,10 @@ class SequencingFacility(models.Model):
     """
     This model will, I think, be the most important for library submission.
     """
+    class Meta:
+        verbose_name = 'Sequencing Facility'
+        verbose_name_plural = 'Sequencing Facilities'
+
     name = models.CharField('Sequencing Facility Name', max_length=1024,
                             help_text='Name of the sequencing facility.')
     description = models.TextField('Sequencing Facility Description',
@@ -309,11 +313,22 @@ class SequencingFacility(models.Model):
     import_name = models.CharField('Sequencing Core Import Name', max_length=256,
                                    help_text='Filename of the core blueprint Python file to import.')
 
-    class Meta:
-        verbose_name = 'Sequencing Facility'
-        verbose_name_plural = 'Sequencing Facilities'
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.__unicode__()
 
 
+class Downloader(models.Model):
+    name = models.CharField('Downloader Readable Name', max_length=256)
+    full_classpath = models.CharField('Downloader Full Classpath', max_length=256)
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.__unicode__()
 
 
 class BidKeyGenerator(models.Model):

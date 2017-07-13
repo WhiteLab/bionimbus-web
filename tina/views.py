@@ -13,9 +13,9 @@ from django.conf import settings
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 
-from models import Project, SequencingFacility, Library
+from models import Project, SequencingFacility, Library, Downloader
 from forms import ProjectForm
-from util import resize_project_thumbnail, TinaCouchDB
+from util import resize_project_thumbnail, TinaCouchDB, find_is_windows
 import seqfacility
 from downloaders.util import create_bundle
 
@@ -148,6 +148,15 @@ class ProjectViews(object):
             return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
 
 
+class LibraryViews(object):
+    class ViewLibraries(View):
+        def get(self, request):
+            context = {
+                'libraries': Library.objects.all()
+            }
+            return render(request, 'tina/libraries/view_libraries.html', context)
+
+
 class SubmitViews(object):
     class SubmitLibrary(View):
         def post(self, request):
@@ -168,6 +177,13 @@ class SubmitViews(object):
 
 
 class CartViews(object):
+    class ViewCart(View):
+        def get(self, request):
+            context = {
+                'downloaders': Downloader.objects.all()
+            }
+            return render(request, 'tina/cart/view_cart.html', context)
+
     class AddToCart(View):
         def get(self, request, library_id):
             if 'cart' not in request.session or not request.session['cart']:
@@ -194,12 +210,23 @@ class CartViews(object):
             There will actually be a lot of logic here to select the correct
             downloader to pass to
             """
-            library_ids_to_download = request.session['cart']
+            # Get and import Downloader class
             downloader_module, downloader_class = request.POST['downloader'].rsplit('.', 1)
             downloader = getattr(importlib.import_module(downloader_module), downloader_class)
             # CartViews.ClearCart.clear(request)
 
-            bundle_path = create_bundle(Library.objects.filter(pk__in=library_ids_to_download))
+            # Create a bundle of library data
+            # TODO Handle case where only one file is downloaded
+            library_ids_to_download = request.session['cart']
+            for_windows = (
+                find_is_windows(request)
+                if 'is_windows' not in request.session
+                else request.session['is_windows']
+            )
+            bundle_path = create_bundle(libraries_to_bundle=Library.objects.filter(pk__in=library_ids_to_download),
+                                        for_windows=for_windows)
+
+            # Process download
             template, context = downloader.process(bundle_path)
             return render(request, template, context)
 

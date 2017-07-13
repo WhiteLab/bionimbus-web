@@ -2,8 +2,10 @@
 
 {% block content %}
 
-<p><a href="/cart/add/1">Library 1</a></p>
-<p><a href="/cart/add/2">Library 2</a></p>
-<p><a href="/cart/add/3">Library 3</a></p>
+<h2>Libraries:</h2>
+
+{% for library in libraries %}
+    <p><a href="/cart/add/{{ library.pk }}">{{ library }}</a></p>
+{% endfor %}
 
 {% endblock content %}

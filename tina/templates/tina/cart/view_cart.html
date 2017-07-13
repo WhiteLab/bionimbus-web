@@ -3,15 +3,20 @@
 {% block content %}
 
 {% if request.session.cart %}
-    <p>{{ request.session.cart }}</p>
+    <p>In cart: {{ request.session.cart }}</p>
 {% else %}
     <p>Nothing in the cart.</p>
 {% endif %}
-<p><a href="/cart/clear">Clear cart</a></p>
 <p>
     <form action="/cart/download/" method="post">
         {% csrf_token %}
-        <input type="hidden" name="downloader" value="tina.downloaders.local.LocalDownloader" />
+        <select name="downloader">
+            {% for downloader in downloaders %}
+            <option value="{{ downloader.full_classpath }}">{{ downloader }}</option>
+            {% endfor %}
+        </select><br/><br/>
+{#        <input type="hidden" name="downloader" value="tina.downloaders.local.LocalDownloader" />#}
+        <a href="/cart/clear"><button type="button">Clear cart</button></a>
         <button type="submit">Create Download Request</button>
     </form>
 </p>

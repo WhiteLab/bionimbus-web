@@ -3,8 +3,8 @@ from . import BaseDownloader
 
 class LocalDownloader(BaseDownloader):
     @staticmethod
-    def process(payload_file):
+    def process(bundle_path):
         context = {
-            'download_path': payload_file
+            'download_path': bundle_path
         }
-        return 'tina/downloader/local.html', context
+        return 'tina/downloaders/local.html', context

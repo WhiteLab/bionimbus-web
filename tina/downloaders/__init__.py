@@ -6,7 +6,7 @@ class BaseDownloader(object):
 
     @staticmethod
     @abstractmethod
-    def process(payload_file):
+    def process(bundle_path):
         """
         This method should return a 2-tuple: (template_path, context_dict)
         """

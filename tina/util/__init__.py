@@ -3,9 +3,18 @@ import couchdb
 from PIL import Image
 from resizeimage import resizeimage
 
+from ua_parser import user_agent_parser
+
 from django.conf import settings
 
 THUMBNAIL_SIZE = (265, 265)
+
+
+def find_is_windows(request):
+    ua_string = request.META['HTTP_USER_AGENT']
+    print user_agent_parser.Parse(ua_string)
+    request.session['is_windows'] = 'windows' in user_agent_parser.Parse(ua_string)['os']['family'].lower()
+    return request.session['is_windows']
 
 
 def resize_project_thumbnail(fullpath, size=THUMBNAIL_SIZE):
