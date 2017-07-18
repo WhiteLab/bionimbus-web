@@ -151,10 +151,14 @@ class ProjectViews(object):
 class LibraryViews(object):
     class ViewLibraries(View):
         def get(self, request):
+            # Set cart session variable
+            if 'cart' not in request.session:
+                request.session['cart'] = list()
+
             context = {
                 'libraries': Library.objects.all()
             }
-            return render(request, 'tina/libraries/view_libraries.html', context)
+            return render(request, 'tina/library/view_library.html', context)
 
 
 class SubmitViews(object):

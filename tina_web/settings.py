@@ -38,9 +38,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'djangobower',
+    'shibboleth',
     'tina',
-    'shibboleth'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -104,6 +105,7 @@ SHIBBOLETH_ATTRIBUTE_MAP = {
 
 DATABASES = local_settings.DATABASES
 
+CHANNEL_LAYERS = local_settings.CHANNEL_LAYERS
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
