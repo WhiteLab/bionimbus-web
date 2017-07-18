@@ -6,7 +6,9 @@ socket.onmessage = function(e) {
     console.log('got message from server');
     var msg = JSON.parse(e.data);
     if (msg.success) {
-        $('#cart-size').text(' (' + msg.cartSize + ')');
+        if (msg.cartSize > 0) {
+            $('#cart-size').removeClass('hidden').text(msg.cartSize);
+        }
     } else {
         makeToast({text: msg.information});
     }
