@@ -4,11 +4,20 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
 import seqfacility
-from views import ProjectViews, SubmitViews
+from views import ProjectViews, LibraryViews, SubmitViews, CartViews
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='tina/home.html'), name='home'),
 
+    # Libraries tab
+    url(r'^libraries/$', LibraryViews.ViewLibraries.as_view(), name='view_libraries'),
+
+    url(r'^cart/$', CartViews.ViewCart.as_view(), name='view_cart'),
+    url(r'^cart/add/(?P<library_id>\d+)/$', CartViews.AddToCart.as_view(), name='add_to_cart'),
+    url(r'^cart/clear/$', CartViews.ClearCart.as_view(), name='clear_cart'),
+    url(r'^cart/download/$', CartViews.HandleDownloadRequest.as_view(), name='download_cart'),
+
+    # Projects tab
     url(r'^projects/$', ProjectViews.Manage.as_view(), name='manage_project'),
     url(r'^projects/(?P<subproj_id>\d+)/$', ProjectViews.Manage.as_view(), name='manage_subproject'),
     url(r'^projects/add/$', ProjectViews.Add.as_view(), name='add_project'),

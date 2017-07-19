@@ -1,0 +1,8 @@
+{% extends 'tina/base.html' %}
+
+{% block content %}
+
+<p>Your local download is being prepared. It will download automatically when it is ready.</p>
+<script>window.location.assign('{{ download_path }}');</script>
+
+{% endblock content %}

@@ -1,5 +1,6 @@
 import os
 import json
+import importlib
 
 import couchdb
 
@@ -10,14 +11,16 @@ from django.core import urlresolvers
 from django.contrib import messages
 from django.conf import settings
 from django.views.generic import View
+from django.contrib.auth.decorators import login_required
 
-from models import Project, SequencingFacility
+from models import Project, SequencingFacility, Library, Downloader
 from forms import ProjectForm
-from util import resize_project_thumbnail, TinaCouchDB
+from util import resize_project_thumbnail, TinaCouchDB, find_is_windows
 import seqfacility
+from downloaders.util import create_bundle
 
 
-class ProjectViews:
+class ProjectViews(object):
     class Manage(View):
         def get(self, request, subproj_id=None):
             if subproj_id is not None:
@@ -145,7 +148,20 @@ class ProjectViews:
             return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
 
 
-class SubmitViews:
+class LibraryViews(object):
+    class ViewLibraries(View):
+        def get(self, request):
+            # Set cart session variable
+            if 'cart' not in request.session:
+                request.session['cart'] = list()
+
+            context = {
+                'libraries': Library.objects.all()
+            }
+            return render(request, 'tina/library/view_library.html', context)
+
+
+class SubmitViews(object):
     class SubmitLibrary(View):
         def post(self, request):
             facility = request.POST.get('facility_select')
@@ -162,3 +178,59 @@ class SubmitViews:
                 'facilities': SequencingFacility.objects.all()
             }
             return render(request, 'tina/submit/submit.html', context)
+
+
+class CartViews(object):
+    class ViewCart(View):
+        def get(self, request):
+            context = {
+                'downloaders': Downloader.objects.all()
+            }
+            return render(request, 'tina/cart/view_cart.html', context)
+
+    class AddToCart(View):
+        def get(self, request, library_id):
+            if 'cart' not in request.session or not request.session['cart']:
+                request.session['cart'] = list()
+            if int(library_id) not in request.session['cart']:
+                request.session['cart'].append(int(library_id))
+                request.session.modified = True
+            return HttpResponseRedirect('/cart')
+
+    class ClearCart(View):
+        @staticmethod
+        def get(request):
+            if 'cart' in request.session:
+                request.session['cart'] = list()
+            return HttpResponseRedirect('/cart')
+
+        @classmethod
+        def clear(cls, request):
+            return cls.get(request)
+
+    class HandleDownloadRequest(View):
+        def post(self, request):
+            """
+            There will actually be a lot of logic here to select the correct
+            downloader to pass to
+            """
+            # Get and import Downloader class
+            downloader_module, downloader_class = request.POST['downloader'].rsplit('.', 1)
+            downloader = getattr(importlib.import_module(downloader_module), downloader_class)
+            # CartViews.ClearCart.clear(request)
+
+            # Create a bundle of library data
+            # TODO Handle case where only one file is downloaded
+            library_ids_to_download = request.session['cart']
+            for_windows = (
+                find_is_windows(request)
+                if 'is_windows' not in request.session
+                else request.session['is_windows']
+            )
+            bundle_path = create_bundle(libraries_to_bundle=Library.objects.filter(pk__in=library_ids_to_download),
+                                        for_windows=for_windows)
+
+            # Process download
+            template, context = downloader.process(bundle_path)
+            return render(request, template, context)
+

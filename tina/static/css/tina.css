@@ -566,6 +566,18 @@ footer.tina-footer div.row {
   text-align: center;
 }
 
+.tina-badge {
+  position: relative;
+  left: 0.2rem;
+  bottom: 0.75rem;
+  background-color: #138a36;
+  color: #fcfcfc;
+  border-radius: 20%;
+  padding: 0 6px;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
 /**
  * jQuery toast plugin created by Kamran Ahmed copyright MIT license 2014
  */

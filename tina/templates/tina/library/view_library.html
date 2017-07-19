@@ -1,0 +1,14 @@
+{% extends 'tina/base.html' %}
+{% load staticfiles %}
+
+{% block extra_js %}
+<script src="{% static 'js/library/view_library.js' %}"></script>
+{% endblock extra_js %}
+
+{% block content %}
+<h2>Libraries:</h2>
+
+{% for library in libraries %}
+    <p><span class="library-button" data-pk="{{ library.pk }}">{{ library }}</span></p>
+{% endfor %}
+{% endblock content %}
