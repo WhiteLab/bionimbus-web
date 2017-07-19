@@ -1,27 +1,99 @@
 {% extends 'tina/base.html' %}
 {% block content %}
-    <div class="row" style="margin-bottom:50px">
-        <div class="col-sm-8">
-            <span class="tina-header">Viewing {{ project.name }}</span>
+{#    <div class="row" style="margin-bottom:50px">#}
+{#        <div class="col-sm-8">#}
+{#            <span class="tina-header">Viewing {{ project.name }}</span>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="tina-project-view-desc">#}
+{#        {% firstof project.description 'No Description' %}#}
+{#    </div>#}
+{#    <div>PI: {% firstof project.PI 'None' %}</div>#}
+{#    <div>Cloud: {% firstof project.cloud 'None' %}</div>#}
+{#    <div>Organism: {% firstof project.organism 'None' %}</div>#}
+{#    <div>Platform: {% firstof project.platform 'None' %}</div>#}
+{##}
+{#    <div>Subprojects:#}
+{#        {% for subproj in project.subprojects %}#}
+{#            {{ subproj.name }}#}
+{#        {% empty %}#}
+{#            None#}
+{#        {% endfor %}#}
+{#    </div><br/>#}
+{##}
+{#    <div>Document Details go here</div><br/>#}
+{##}
+{#    <button class="tina-btn" onclick="window.history.back();">Back</button>#}
+
+        <div class="row">
+        <div class="tina-project-view-desc">
+          <img class="card-img-top" src={{ MEDIA_URL }}{{ project.project_cover_image.url }} alt="Card image cap">
+          <div class="card-block">
+            <p class="card-text"> {{ project.name }} </p>
+          </div>
         </div>
     </div>
-    <div class="tina-project-view-desc">
-        {% firstof project.description 'No Description' %}
+    <div class="row">
+      <div class="card">
+        <div class="container" style="text-align: left">
+          <div class="row">
+            <div class="col-sm-12">
+              <hr class="my-8">
+              <p class="card-text"> {% firstof project.description 'No Description' %} </p>
+              <hr class="my-8">
+              <div class="row">
+                   <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Project PI</th>
+                          <th>Cloud</th>
+                          <th>Organism</th>
+                          <th>Platform</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                            <tr>
+                                <td>
+                                    {% firstof project.PI 'None' %}
+                                </td>
+                                <td>
+                                    {% firstof project.cloud 'None' %}
+                                </td>
+                                <td>
+                                    {% firstof project.organism 'None' %}
+                                </td>
+                                <td>
+                                    {% firstof project.platform 'None' %}
+                                </td>
+                            </tr>
+                      </tbody>
+                    </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <hr class="my-8">
+          <div class="col-6 col-sm-2" style="margin-left:16px" >Subprojects:
+              {% for subproj in project.subprojects %}
+              <div class="row">
+                <div class="col-6 col-sm-2">
+                  <p class="card-text"> {{ subproj.name }} </p>
+                </div>
+              </div>
+              {% empty %}
+                None
+              {% endfor %}
+          </div><br/>
+        </div>
+        <div > Document details go here </div><br/>
+      </div>
     </div>
-    <div>PI: {% firstof project.PI 'None' %}</div>
-    <div>Cloud: {% firstof project.cloud 'None' %}</div>
-    <div>Organism: {% firstof project.organism 'None' %}</div>
-    <div>Platform: {% firstof project.platform 'None' %}</div>
 
-    <div>Subprojects:
-        {% for subproj in project.subprojects %}
-            {{ subproj.name }}
-        {% empty %}
-            None
-        {% endfor %}
-    </div><br/>
+    <div class="row">
+      <button class="tina-btn" style="margin-top:30px" onclick="window.history.back();">Back</button>
+    </div>
 
-    <div>Document Details go here</div><br/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-    <button class="tina-btn" onclick="window.history.back();">Back</button>
 {% endblock %}

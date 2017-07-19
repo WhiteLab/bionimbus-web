@@ -179,6 +179,17 @@ class SubmitViews(object):
             }
             return render(request, 'tina/submit/submit.html', context)
 
+class LibraryViews:
+    class Manage(View):
+        def get(self, request):
+            bid1 = {'bid':'1','project': 'PEC', 'status': 'submitted'}
+            bid2 = {'bid':'2','project': 'mod', 'status': 'processed'}
+            bid3 = {'bid':'3','project': 'PanCan', 'status': 'processing'}
+            testContext = [bid1, bid2, bid3]
+            context = {
+                'bids': testContext
+            }
+            return render(request, 'tina/project/view_libraries.html', context)
 
 class CartViews(object):
     class ViewCart(View):
