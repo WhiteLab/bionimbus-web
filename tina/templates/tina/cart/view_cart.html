@@ -1,0 +1,23 @@
+{% extends 'tina/base.html' %}
+
+{% block content %}
+
+{% if request.session.cart %}
+    <p>In cart: {{ request.session.cart }}</p>
+{% else %}
+    <p>Nothing in the cart.</p>
+{% endif %}
+<p>
+    <form action="/cart/download/" method="post">
+        {% csrf_token %}
+        <select name="downloader">
+            {% for downloader in downloaders %}
+            <option value="{{ downloader.full_classpath }}">{{ downloader }}</option>
+            {% endfor %}
+        </select><br/><br/>
+{#        <input type="hidden" name="downloader" value="tina.downloaders.local.LocalDownloader" />#}
+        <a href="/cart/clear"><button type="button">Clear cart</button></a>
+        <button type="submit">Create Download Request</button>
+    </form>
+</p>
+{% endblock content %}
