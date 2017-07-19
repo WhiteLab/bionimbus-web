@@ -16,3 +16,13 @@ String.prototype.format = function () {
     return typeof args[i] != 'undefined' ? args[i++] : '';
   });
 };
+
+function makeToast(options) {
+    console.log('making toast');
+    $.toast(extend({
+        bgColor: '#138a36',
+        textColor: '#e1e6e1',
+        loaderBg: '#333333',
+        position: 'bottom-right'
+    }, options));
+}

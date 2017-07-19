@@ -1,5 +1,6 @@
 import os
 import json
+import importlib
 
 import couchdb
 
@@ -10,32 +11,16 @@ from django.core import urlresolvers
 from django.contrib import messages
 from django.conf import settings
 from django.views.generic import View
+from django.contrib.auth.decorators import login_required
 
-from models import Project, SequencingFacility
+from models import Project, SequencingFacility, Library, Downloader
 from forms import ProjectForm
-from util import resize_project_thumbnail, TinaCouchDB
+from util import resize_project_thumbnail, TinaCouchDB, find_is_windows
 import seqfacility
-
-from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
-from tina.serializers import UserSerializer, GroupSerializer
-
-from serializers import ProjectSerializer
-from permissions import IsOwnerOrReadOnly
-from django.http import Http404
-
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework import mixins
-from rest_framework import generics
-from rest_framework import permissions
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
+from downloaders.util import create_bundle
 
 
-class ProjectViews:
+class ProjectViews(object):
     class Manage(View):
         def get(self, request, subproj_id=None):
             if subproj_id is not None:
@@ -163,7 +148,20 @@ class ProjectViews:
             return HttpResponseRedirect(urlresolvers.reverse('manage_project'))
 
 
-class SubmitViews:
+class LibraryViews(object):
+    class ViewLibraries(View):
+        def get(self, request):
+            # Set cart session variable
+            if 'cart' not in request.session:
+                request.session['cart'] = list()
+
+            context = {
+                'libraries': Library.objects.all()
+            }
+            return render(request, 'tina/library/view_library.html', context)
+
+
+class SubmitViews(object):
     class SubmitLibrary(View):
         def post(self, request):
             facility = request.POST.get('facility_select')
@@ -193,55 +191,57 @@ class LibraryViews:
             }
             return render(request, 'tina/project/view_libraries.html', context)
 
-# Using generic class-based views
+class CartViews(object):
+    class ViewCart(View):
+        def get(self, request):
+            context = {
+                'downloaders': Downloader.objects.all()
+            }
+            return render(request, 'tina/cart/view_cart.html', context)
 
-# http http://127.0.0.1:8000/projects/list/
+    class AddToCart(View):
+        def get(self, request, library_id):
+            if 'cart' not in request.session or not request.session['cart']:
+                request.session['cart'] = list()
+            if int(library_id) not in request.session['cart']:
+                request.session['cart'].append(int(library_id))
+                request.session.modified = True
+            return HttpResponseRedirect('/cart')
 
-class ProjectList(generics.ListCreateAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+    class ClearCart(View):
+        @staticmethod
+        def get(request):
+            if 'cart' in request.session:
+                request.session['cart'] = list()
+            return HttpResponseRedirect('/cart')
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        @classmethod
+        def clear(cls, request):
+            return cls.get(request)
 
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    class HandleDownloadRequest(View):
+        def post(self, request):
+            """
+            There will actually be a lot of logic here to select the correct
+            downloader to pass to
+            """
+            # Get and import Downloader class
+            downloader_module, downloader_class = request.POST['downloader'].rsplit('.', 1)
+            downloader = getattr(importlib.import_module(downloader_module), downloader_class)
+            # CartViews.ClearCart.clear(request)
 
+            # Create a bundle of library data
+            # TODO Handle case where only one file is downloaded
+            library_ids_to_download = request.session['cart']
+            for_windows = (
+                find_is_windows(request)
+                if 'is_windows' not in request.session
+                else request.session['is_windows']
+            )
+            bundle_path = create_bundle(libraries_to_bundle=Library.objects.filter(pk__in=library_ids_to_download),
+                                        for_windows=for_windows)
 
-class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+            # Process download
+            template, context = downloader.process(bundle_path)
+            return render(request, template, context)
 
-
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API end point that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited
-    """
-
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'projects': reverse('project-list', request=request, format=format)
-    })
