@@ -22,6 +22,8 @@ requests==2.12.4
 
 six==1.10.0
 
+Have couchdb installed
+
 Run server
 ------------
 

@@ -34,6 +34,8 @@
     <!-- Custom JS utilities -->
     <script src="{% static 'js/util.js' %}"></script>
     {% block extra_js %}{% endblock %}
+
+{#    <script src="{% static "tablesorter/tablesorter.js" %}"></script>#}
 </head>
 <body>
     <div class="tina-content">
@@ -42,7 +44,7 @@
                 <a href="/"><img src="{% static 'img/tina-logo.svg' %}" /></a>&nbsp;&nbsp;{% strings 'app_name' %}
             </span>
             <div class="tina-nav-right">
-                <a href="#"><span class="tina-nav-content">Libraries</span></a>
+                <a href="{% url 'libraries' %}"><span class="tina-nav-content">Libraries</span></a>
                 <a href="{% url 'manage_project' %}"><span class="tina-nav-content">Projects</span></a>
                 <a href="{% url 'submit_library' %}"><span class="tina-nav-content">Submit</span></a>
             </div>

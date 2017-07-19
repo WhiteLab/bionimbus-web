@@ -11,7 +11,7 @@ import views
 from django.conf.urls import include
 
 import seqfacility
-from views import ProjectViews, SubmitViews
+from views import ProjectViews, SubmitViews, LibraryViews
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -51,7 +51,7 @@ urlpatterns = [
     url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view(), name='get_user'),
     # Submit Tab
     url(r'^submit/$', SubmitViews.SubmitLibrary.as_view(), name='submit_library'),
-
+    url(r'^libraries/$', LibraryViews.Manage.as_view(), name='libraries'),
     # Sequencing Facility AJAX
     url(r'^seqfacility/(?P<facility>\w+)/$', seqfacility.get_submit_form,
         name='seqfacility_get_submit_form')
