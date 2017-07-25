@@ -1,0 +1,29 @@
+@import "../sass/colors";
+
+.view-library {
+  &-search {
+    padding-left: 4rem;
+    background: {
+      color: white;
+      position: 2rem 50%;
+      repeat: no-repeat;
+    }
+  }
+
+  // Library table
+  &-table {
+    width: 100%;
+    margin-top: 50px;
+
+    &-group-header {
+      background-color: $forest_green;
+      border: {
+        top: 3px solid $charcoal;
+        bottom: 3px solid $charcoal;
+      }
+      padding-left: 2rem;
+      font-size: 1.6rem;
+      color: $platinum;
+    }
+  }
+}

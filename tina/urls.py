@@ -5,13 +5,11 @@ from django.views.generic import TemplateView
 
 import seqfacility
 
-from views import ProjectViews, LibraryViews, SubmitViews, CartViews
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
 
-# Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'is_staff')
+from views import ProjectViews, LibraryViews, SubmitViews, CartViews
+from serializers import UserSerializer
 
 
 # ViewSets define the view behavior.
@@ -47,7 +45,7 @@ urlpatterns = [
 
     # Submit Tab
     url(r'^submit/$', SubmitViews.SubmitLibrary.as_view(), name='submit_library'),
-    url(r'^libraries/$', LibraryViews.Manage.as_view(), name='libraries'),
+    url(r'^libraries2/$', LibraryViews.Manage.as_view(), name='libraries'),
     # Sequencing Facility AJAX
     url(r'^seqfacility/(?P<facility>\w+)/$', seqfacility.get_submit_form,
         name='seqfacility_get_submit_form')

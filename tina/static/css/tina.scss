@@ -4,6 +4,8 @@
 
 @import '../sass/modules/flip_card';
 
+@import 'view_library';
+
 body {
   //height: 9000px;
   font: {
@@ -147,6 +149,13 @@ footer.tina-footer {
     text-align: center;
   }
 }
+
+.footer-strip {
+    width: 100%;
+    height: 4px;
+    background-color: $forest_green;
+  }
+
 
 .tina-badge {
   position: relative;

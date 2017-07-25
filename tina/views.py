@@ -2,6 +2,8 @@ import os
 import json
 import importlib
 
+from collections import defaultdict, deque
+
 import couchdb
 
 from django.shortcuts import render
@@ -13,12 +15,12 @@ from django.conf import settings
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 
-from models import Project, SequencingFacility, Library, Downloader
+import tina.models
+from tina.models import Project, SequencingFacility, Library, Downloader, Biospecimen, Sample
 from forms import ProjectForm
-from util import resize_project_thumbnail, TinaCouchDB, find_is_windows
+from util import resize_project_thumbnail, TinaCouchDB, find_is_windows, LibraryTable, HierarchyEntity
 import seqfacility
 from downloaders.util import create_bundle
-
 
 class ProjectViews(object):
     class Manage(View):
@@ -149,14 +151,44 @@ class ProjectViews(object):
 
 
 class LibraryViews(object):
+    class Manage(View):
+        """
+        This is Thomas' library view class
+        """
+        def get(self, request):
+            bid1 = {'bid':'1','project': 'PEC', 'status': 'submitted'}
+            bid2 = {'bid':'2','project': 'mod', 'status': 'processed'}
+            bid3 = {'bid':'3','project': 'PanCan', 'status': 'processing'}
+            testContext = [bid1, bid2, bid3]
+            context = {
+                'bids': testContext
+            }
+            return render(request, 'tina/project/view_libraries.html', context)
+
     class ViewLibraries(View):
+        """
+        This is Dominic's library view class
+        """
         def get(self, request):
             # Set cart session variable
             if 'cart' not in request.session:
                 request.session['cart'] = list()
 
+            display_class = getattr(tina.models, request.GET.get('group_by', ''), Sample)
+
+            library_display_table = (
+                LibraryTable(Library.objects.all())
+                    .groupby(groupby_entity=display_class)
+                    .groups_to_str().render()
+            )
+
+            # TODO Restrict results to only Projects the user is on
+            groupby_options = HierarchyEntity.get_hierarchy()
+
             context = {
-                'libraries': Library.objects.all()
+                'library_display_table': library_display_table,
+                'groupby_options': groupby_options,
+                'groupby_current': request.GET.get('group_by')
             }
             return render(request, 'tina/library/view_library.html', context)
 
@@ -179,17 +211,6 @@ class SubmitViews(object):
             }
             return render(request, 'tina/submit/submit.html', context)
 
-class LibraryViews:
-    class Manage(View):
-        def get(self, request):
-            bid1 = {'bid':'1','project': 'PEC', 'status': 'submitted'}
-            bid2 = {'bid':'2','project': 'mod', 'status': 'processed'}
-            bid3 = {'bid':'3','project': 'PanCan', 'status': 'processing'}
-            testContext = [bid1, bid2, bid3]
-            context = {
-                'bids': testContext
-            }
-            return render(request, 'tina/project/view_libraries.html', context)
 
 class CartViews(object):
     class ViewCart(View):
