@@ -1,0 +1,29 @@
+<link rel="import" href="/static/polymer/polymer.html">
+<link rel="import" href="rudy-group.html">
+
+<dom-module id="rudy-table">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-flow: column nowrap;
+                justify-content: space-between;
+            }
+        </style>
+        <template is="dom-repeat" items="{{ tableData }}">
+            <rudy-group row-data="{{ item.groupData }}" header="{{ item.header }}"></rudy-group>
+        </template>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-table',
+
+            properties: {
+                tableData: {
+                    type: Array,
+                    value: function(){return []}
+                }
+            }
+        });
+    </script>
+</dom-module>

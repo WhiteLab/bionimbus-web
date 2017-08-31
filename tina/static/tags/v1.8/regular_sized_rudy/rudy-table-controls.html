@@ -1,0 +1,31 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="rudy-table-controls">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                justify-content: space-between;
+            }
+        </style>
+        <input class="view-library-search" id="tina-search" placeholder="Search"/>
+        <select>
+            <option>Apply Filter</option>
+        </select>
+        <select>
+            <option>Group By</option>
+        </select>
+        <div>
+            <button class="tina-btn-inline" style="float:right"><i class="fa fa-bars"></i></button>
+            <button class="tina-btn-inline"><i class="fa fa-th-large"></i></button>
+        </div>
+        <button class="tina-btn-inline">
+            <i class="fa fa-gear"></i>&nbsp;&nbsp;Settings
+        </button>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-table-controls'
+        });
+    </script>
+</dom-module>

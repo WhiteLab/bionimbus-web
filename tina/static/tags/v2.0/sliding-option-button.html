@@ -1,7 +1,7 @@
-<link rel="import" href="/static/polymer/polymer.html">
+<link rel="import" href="/static/polymer/polymer-element.html">
 
 <dom-module id="sliding-option-button">
-    <template>
+    <template id="slidingOptionButtonTemplate">
         <style>
             :host {
               display: flex;
@@ -15,15 +15,19 @@
               border: none;
               color: var(--foreground-color, #141914);
             }
-            :host:hover ::content > a {
+            :host(:hover) ::slotted(a) {
               flex-grow: 1;
+              background-color: green;
             }
-            :host:hover ::content > a:hover:before {
+            :host(:hover) ::slotted(a:first-child) {
+                flex-grow: var(--primary-option-flex-size, 4);
+                flex-shrink: 0;
+                background-color: yellow;
+            }
+            :host(:hover) ::slotted(a:hover:before) {
               background-color: var(--foreground-color, #141914);
             }
-            :host ::content > a {
-              /*padding-top: 8px;
-              padding-bottom: 8px;*/
+            :host > ::slotted(a) {
               padding-top: var(--padding-top, 8px);
               padding-bottom: var(--padding-bottom, 8px);
               position: relative;
@@ -35,11 +39,10 @@
               -moz-transition: flex-grow 0.3s;
               transition: flex-grow 0.3s;
             }
-            :host ::content > a:before {
+            :host > ::slotted(a:before) {
               content: '';
               position: absolute;
               display: block;
-              /*height: 4px;*/
               height: var(--height, 4px);
               background-color: transparent;
               top: 0;
@@ -49,19 +52,96 @@
               -moz-transition: background-color 0.3s ease;
               transition: background-color 0.3s ease;
             }
-            :host ::content > a:first-child {
+            :host > ::slotted(a:first-child) {
               flex-grow: var(--primary-option-flex-size, 4);
               flex-shrink: 0;
+              color: yellow;
+            }
+            #members > ::slotted(a) {
+                background-color: purple;
             }
         </style>
 
 
+        <div id="members">
+            <slot></slot>
+        </div>
 
-
-        <content></content>
     </template>
 
     <script>
+        let observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                console.log(mutation.type);
+            });
+        });
+        observer.observe(document.getElementById('members'), {attributes: true, childList: true, characterData: true});
+        class SlidingOptionButton extends Polymer.Element {
+            static get is() { return 'sliding-option-button' }
+            constructor() { super(); }
+            /*static get properties() {
+                return {
+                    'option-colors': {
+                        type: String,
+                        value: '#eee'
+                    },
+                    'primary-option-flex': {
+                        type: String,
+                        value: '4'
+                    },
+                    'size': {
+                        type: String,
+                        value: 'regular'
+                    }
+                }
+            }
+            connectedCallback() {
+                super.connectedCallback();
+                // Set option links background colors
+                var bgcolorCycle = this['option-colors'].trim().split(' ');
+                var bgcolorCycleLen = bgcolorCycle.length;
+
+                var linkElements = this.shadowRoot.querySelector('slot').assignedNodes({flatten: true}).filter(n => n.nodeType === Node.ELEMENT_NODE);
+                for (var i = 0; i < linkElements.length; i++) {
+                    linkElements[i].style.backgroundColor = bgcolorCycle[i % bgcolorCycleLen];
+                }
+
+                // Set flex size of primary option
+                var styles = {'--primary-option-flex-size': this['primary-option-flex']};
+                if (this.isSlim()) {
+                    styles['--font-size'] = '1.5rem';
+                    styles['--padding-top'] = '0';
+                    styles['--padding-bottom'] = '0';
+                    styles['--height'] = '2px';
+                } else if (this.isLarge()) {
+                    styles['--font-size'] = '3rem';
+                    styles['--padding-top'] = '16px';
+                    styles['--padding-bottom'] = '16px';
+                    styles['--height'] = '6px';
+                }
+
+                this.updateStyles(styles);
+            }
+            isSlim() {
+                var size = this.size.trim().toLowerCase();
+                return size === 'slim' ||
+                        size === 'small' ||
+                        size === 'sm' ||
+                        size === 's';
+            }
+            isLarge() {
+                var size = this.size.trim().toLowerCase();
+                return size === 'large' ||
+                        size === 'lg' ||
+                        size === 'l' ||
+                        size === 'jumbo' ||
+                        size === 'plus';
+            }*/
+
+        }
+        customElements.define(SlidingOptionButton.is, SlidingOptionButton);
+
+/*
         Polymer({
             is: 'sliding-option-button',
             properties: {
@@ -122,6 +202,6 @@
                         size == 'jumbo' ||
                         size == 'plus';
             }
-        });
+        });*/
     </script>
 </dom-module>

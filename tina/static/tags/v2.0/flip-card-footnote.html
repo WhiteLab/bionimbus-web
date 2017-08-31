@@ -1,0 +1,36 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="flip-card-footnote">
+    <template>
+        <style>
+            :host {
+                position: relative;
+                flex-grow: 1;
+            }
+
+            :host span {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                background-color: #fcfcfc;
+                font-size: 1.2rem;
+                padding-left: 4%;
+                padding-right: 4%;
+                padding-bottom: 4px;
+            }
+        </style>
+        <span><content></content></span>
+    </template>
+
+    <script>
+        class FlipCardFootnote extends Polymer.Element {
+            static get is() { return 'flip-card-footnote' }
+            constructor() { super(); }
+        }
+        customElements.define(FlipCardFootnote.is, FlipCardFootnote);
+        /*
+        Polymer({
+            is: 'flip-card-footnote'
+        });*/
+    </script>
+</dom-module>

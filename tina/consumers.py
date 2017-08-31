@@ -6,15 +6,15 @@ from tina.models import Library
 
 
 def create_reply_message(success, context=None):
-        if context is None:
-            context = dict()
-        context.update({'success': bool(success)})
-        return {'text': json.dumps(context)}
+    context = context or dict()
+    context.update({'success': bool(success)})
+    return {'text': json.dumps(context)}
 
 
 class CartWebSockets(object):
     @staticmethod
     def cart_add_success_message(libs_added_to_cart):
+        # TODO Wow this is a messy function, and should it even live here?
         if len(libs_added_to_cart) == 1:
             return '{} was successfully added to your cart.'.format(
                 Library.objects.get(pk=libs_added_to_cart[0]).name

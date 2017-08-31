@@ -177,18 +177,49 @@ class LibraryViews(object):
             display_class = getattr(tina.models, request.GET.get('group_by', ''), Sample)
 
             library_display_table = (
-                LibraryTable(Library.objects.all())
+                LibraryTable(Library.objects.all(), columns=('name', 'assay', 'read_length', 'barcode'))
                     .groupby(groupby_entity=display_class)
-                    .groups_to_str().render()
+                    .groups_to_str().to_json()
             )
+            print(library_display_table)
 
             # TODO Restrict results to only Projects the user is on
             groupby_options = HierarchyEntity.get_hierarchy()
 
+            temp_library_table_data = json.dumps([
+                {
+                    'groupData': [
+                        ['2015-100', 'sixteen', 'beta radio'],
+                        ['2015-101', 'nine', 'beta radio'],
+                        ['2015-102', 'sixteen', 'beta radio'],
+                        ['2015-103', 'brain', 'beta radio'],
+                        ['2015-104', 'gardens', 'beta radio'],
+                        ['2015-105', 'guts digest', 'beta radio'],
+                        ['2015-106', 'worse', 'beta radio'],
+                        ['2015-107', 'say', 'beta radio'],
+                    ],
+                    'header': 'Beta Radio is great'
+                },
+                {
+                    'groupData': [
+                        ['2016-700', 'sparrow', 'who are you']
+                    ],
+                    'header': 'A Single Sample'
+                },
+                {
+                    'groupData': [
+                        ['2017-345', 'one', 'everybody knew'],
+                        ['2017-366', 'twenty', 'obeyed'],
+                        ['2017-397', 'seven thousand', 'it was splitting through the trees'],
+                    ],
+                    'header': 'Oh my White Fawn'
+                },
+            ])
+
             context = {
                 'library_display_table': library_display_table,
                 'groupby_options': groupby_options,
-                'groupby_current': request.GET.get('group_by')
+                'groupby_current': request.GET.get('group_by'),
             }
             return render(request, 'tina/library/view_library.html', context)
 

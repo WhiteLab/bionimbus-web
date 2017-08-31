@@ -192,13 +192,14 @@ class LibraryTable(object):
     """
     TableRow = namedtuple('TableRow', 'library_inst row_content')
 
-    def __init__(self, libraries):
+    def __init__(self, libraries, columns):
         self.table = defaultdict(list)
 
         # Get all Libraries grouped by it's immediate superior model
         for library in libraries.order_by('parent_model'):
+            row_content = [str(getattr(library, col, '')) for col in columns]
             self.table[library.parent_model.lineage(to_root=False)].append(
-                LibraryTable.TableRow(library_inst=library, row_content=[library.name])
+                LibraryTable.TableRow(library_inst=library, row_content=row_content)
             )
         self.table = dict(self.table)
 
@@ -225,10 +226,21 @@ class LibraryTable(object):
 
         return self
 
+    def to_json(self):
+        json_obj = list()
+        for grouping, table_rows in self.table.iteritems():
+            json_obj.append({
+                'groupData': [table_row.row_content for table_row in table_rows],
+                'header': grouping
+            })
+        return json.dumps(json_obj)
+
     def render(self):
-        # for grouping, table_rows in self.table.iteritems():
-        #     for table_row in table_rows:
-        #         table_row[FIRST] = table_row[FIRST].name
+        import random
+        import string
+        for grouping, table_rows in self.table.iteritems():
+            for table_row in table_rows:
+                table_row.row_content.extend([''.join([string.ascii_letters[random.randint(0,51)] for i in range(random.randint(1,100))]) for s in range(4)])
         return self.table
 
     # @staticmethod

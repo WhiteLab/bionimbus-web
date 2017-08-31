@@ -1,0 +1,46 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="rudy-row">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-flow: row nowrap;
+            }
+            .item-row {
+                display: flex;
+                flex-flow: row nowrap;
+                flex-grow: 1;
+                flex-basis: 0;
+                word-break: break-all;
+            }
+        </style>
+        <div>
+            <input id="rudycheck" type="checkbox" class="tina-small-check">
+        </div>
+        <template is="dom-repeat" items="{{ colData }}">
+            <div class="item-row">{{ item }}</div>
+        </template>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-row',
+
+            properties: {
+                colData: {
+                    type: Array,
+                    value: function(){return []},
+                },
+                checked: {
+                    type: String,
+                    value: '',
+                    observer: '_isChecked'
+                }
+            },
+
+            _isChecked: function(newVal) {
+                this.$.rudycheck.checked = !!newVal;
+            }
+        });
+    </script>
+</dom-module>

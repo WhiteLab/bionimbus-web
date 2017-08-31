@@ -51,6 +51,10 @@ $(document).ready(function(){
 
     });
 
+    $('.grouping-parent').click(function(){
+        $('input[type="checkbox"]').hasData()
+    });
+
     // var rows = [
     //     ['a', 'b', 'c', 'd'],
     //     ['e', 'f', 'g', 'h'],

@@ -7,6 +7,7 @@
 {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>#}
 {#    <script src="http://jarwol.com/aTable/dist/0.4.0/atable.min.js"></script>#}
 <script src="{% static 'js/library/view_library.js' %}"></script>
+    <link rel="import" href="{% static 'tags/v1.8/regular_sized_rudy/rudy-library-display.html' %}" />
 {% endblock extra_js %}
 
 {% block content %}
@@ -33,26 +34,66 @@
 
     <button type="button" class="tina-btn" id="tina-add-to-cart-btn">Add to Cart</button>
 
-<table class="view-library-table">
-    <thead></thead>
-    <tbody>
-        {% for header_string, table_rows in library_display_table.iteritems %}
-            {% if table_rows %}
-                <tr>
-                    <td colspan="100" class="view-library-table-group-header">
-                        {{ header_string }}
-                    </td>
-                </tr>
-                {% for table_row in table_rows %}
-                    <tr>
-                        <td><input type="checkbox" class="tina-small-check" data-lib-pk="{{ table_row.library_inst.pk }}"></td>
-                        {% for col_data in table_row.row_content %}
-                            <td>{{ col_data }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-    </tbody>
-</table>
+
+
+{#<div class="view-library-table" style="display:flex;flex-flow:column nowrap;justify-content:space-between">#}
+    {# Check out http://inlehmansterms.net/2014/10/11/responsive-tables-with-flexbox/ #}
+{#    {% for header_string, table_rows in library_display_table.iteritems %}#}
+{#        <rudy-group row-data="[[1,2],[3,5]]" header="{{ header_string }}"></rudy-group>#}
+{#    {% endfor %}#}
+{#</div>#}
+<div style="margin-top: 50px"></div>
+
+<rudy-library-display table-data='{{ library_display_table }}'></rudy-library-display>
+
+
+
+
+{#<table class="view-library-table">#}
+{#    <thead></thead>#}
+{#    <tbody>#}
+{#        {% for header_string, table_rows in library_display_table.iteritems %}#}
+{#            {% if table_rows %}#}
+{#                <tr>#}
+{#                    <td colspan="100" class="view-library-table-group-header">#}
+{#                        <input type="checkbox" class="tina-small-check grouping-parent" data-grouping-parent-i="{{ forloop.counter }}">#}
+{#                        <span>{{ header_string }}</span>#}
+{#                    </td>#}
+{#                </tr>#}
+{#                {% for table_row in table_rows %}#}
+{#                    <tr>#}
+{#                        <td><input type="checkbox" class="tina-small-check" data-lib-pk="{{ table_row.library_inst.pk }}" data-grouping-child-i="{{ forloop.counter }}"></td>#}
+{#                        {% for col_data in table_row.row_content %}#}
+{#                            <td>{{ col_data }}</td>#}
+{#                        {% endfor %}#}
+{#                    </tr>#}
+{#                {% endfor %}#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{#    </tbody>#}
+{#</table>#}
+{#<div class="view-library-table" style="display:flex;flex-flow:column nowrap;justify-content:space-between">#}
+    {# Check out http://inlehmansterms.net/2014/10/11/responsive-tables-with-flexbox/ #}
+{#    <div style="display:table-header-group"></div>#}
+{#    <div>#}
+{#        {% for header_string, table_rows in library_display_table.iteritems %}#}
+{#            {% if table_rows %}#}
+{#                <div style="display:table-row">#}
+{#                    <div style="width: 100%" class="view-library-table-group-header">#}
+{#                        <input type="checkbox" class="tina-small-check grouping-parent" data-grouping-parent-i="{{ forloop.counter }}">#}
+{#                        <span>{{ header_string }}</span>#}
+{#                    </div>#}
+{#                </div>#}
+{#                {% for table_row in table_rows %}#}
+{#                    <div style="display:flex;flex-flow:row nowrap">#}
+{#                        <div><input type="checkbox" class="tina-small-check" data-lib-pk="{{ table_row.library_inst.pk }}" data-grouping-child-i="{{ forloop.counter }}"></div>#}
+{#                        {% for col_data in table_row.row_content %}#}
+{#                            <rudy-data datum="{{ col_data }}"></rudy-data>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                {% endfor %}#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{#    </div>#}
+{#</div>#}
 {% endblock content %}

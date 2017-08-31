@@ -1,0 +1,22 @@
+<link rel="import" href="/static/polymer/polymer.html">
+<link rel="import" href="rudy-table.html">
+<link rel="import" href="rudy-table-controls.html">
+
+<dom-module id="rudy-library-display">
+    <template>
+        <rudy-table-controls></rudy-table-controls>
+        <rudy-table table-data="{{ tableData }}"></rudy-table>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-library-display',
+
+            properties: {
+                tableData: {
+                    type: Array,
+                    value: function(){return []}
+                }
+            }
+        });
+    </script>
+</dom-module>
