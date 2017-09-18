@@ -29,6 +29,7 @@ urlpatterns = [
 
     # Libraries tab
     url(r'^libraries/$', LibraryViews.ViewLibraries.as_view(), name='view_libraries'),
+    url(r'^libraries/data/$', LibraryViews.TableDisplayAJAX.as_view(), name='table_display_ajax'),
 
     url(r'^cart/$', CartViews.ViewCart.as_view(), name='view_cart'),
     url(r'^cart/add/(?P<library_id>\d+)/$', CartViews.AddToCart.as_view(), name='add_to_cart'),

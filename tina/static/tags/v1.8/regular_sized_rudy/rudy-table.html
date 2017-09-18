@@ -1,5 +1,6 @@
 <link rel="import" href="/static/polymer/polymer.html">
 <link rel="import" href="rudy-group.html">
+<link rel="import" href="rudy-header.html">
 
 <dom-module id="rudy-table">
     <template>
@@ -10,8 +11,9 @@
                 justify-content: space-between;
             }
         </style>
+        <rudy-header header-data="{{ headerData }}"></rudy-header>
         <template is="dom-repeat" items="{{ tableData }}">
-            <rudy-group row-data="{{ item.groupData }}" header="{{ item.header }}"></rudy-group>
+            <rudy-group row-data="{{ item.rows }}" header="{{ item.group }}"></rudy-group>
         </template>
     </template>
     <script>
@@ -22,7 +24,19 @@
                 tableData: {
                     type: Array,
                     value: function(){return []}
+                },
+                headerData: {
+                    type: Array,
+                    value: function(){return []}
                 }
+            },
+
+            getCheckedIds: function() {
+                var ids = [];
+                Polymer.dom(this.root).querySelectorAll('rudy-group').forEach(function(g) {
+                    ids.push.apply(ids, g.getCheckedIds());
+                });
+                return ids;
             }
         });
     </script>

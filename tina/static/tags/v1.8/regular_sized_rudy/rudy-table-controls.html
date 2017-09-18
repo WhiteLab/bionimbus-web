@@ -11,21 +11,52 @@
         <input class="view-library-search" id="tina-search" placeholder="Search"/>
         <select>
             <option>Apply Filter</option>
+            <option>Under Construction</option>
         </select>
-        <select>
-            <option>Group By</option>
+        <select id="groupBySelect" on-change="groupByChange">
+            <option value="" disabled hidden selected>Group By</option>
+            <template is="dom-repeat" items="{{ entities }}">
+                <option value$="{{ item }}">{{ item }}</option>
+            </template>
         </select>
         <div>
-            <button class="tina-btn-inline" style="float:right"><i class="fa fa-bars"></i></button>
-            <button class="tina-btn-inline"><i class="fa fa-th-large"></i></button>
+            <button class="tina-btn-inline" style="float:right" on-click="pageRight">Next Page&nbsp;&nbsp;<i class="fa fa-caret-right"></i></button>
+            <button class="tina-btn-inline" style="float:right" on-click="pageLeft"><i class="fa fa-caret-left"></i>&nbsp;&nbsp;Last Page</button>
         </div>
-        <button class="tina-btn-inline">
-            <i class="fa fa-gear"></i>&nbsp;&nbsp;Settings
+        <button class="tina-btn-inline" id="cart-btn" on-tap="addIdsToCart">
+            <i class="fa fa-gear"></i>&nbsp;&nbsp;Add to Cart
         </button>
     </template>
     <script>
         Polymer({
-            is: 'rudy-table-controls'
+            is: 'rudy-table-controls',
+
+            properties: {
+                entities: {
+                    type: Array,
+                    value: function(){return []}
+                },
+                groupByValue: {
+                    type: String,
+                    notify: true
+                }
+            },
+
+            groupByChange: function(e) {
+                this.groupByValue = e.target.value;
+            },
+
+            addIdsToCart: function() {
+                this.fire('addidstocart');
+            },
+
+            pageRight: function() {
+                this.fire('pageright');
+            },
+
+            pageLeft: function() {
+                this.fire('pageleft')
+            }
         });
     </script>
 </dom-module>

@@ -151,6 +151,39 @@ class ProjectViews(object):
 
 
 class LibraryViews(object):
+    class TableDisplayAJAX(View):
+        def get(self, request):
+            # import time
+            # time.sleep(1)
+            projects = ['Project1', 'Project2']
+            biospecimens = ['Bio1', 'Bio2', 'Bio3', 'Bio4']
+            bid_counter = 100
+            from random_words import RandomWords
+            from random import choice, randint
+            words = RandomWords().random_words(count=25)
+            random_table_data = list()
+            for i in range(45):
+                random_table_data.append({
+                    'id': i,
+                    'data': [
+                        choice(projects),
+                        choice(biospecimens),
+                        'Sample{}'.format(randint(1, 15)),
+                        '2017-{}'.format(bid_counter),
+                        choice(words),
+                        choice(words)
+                    ]
+                })
+                bid_counter += 1
+            temp_library_table_data4 = {
+                'headers': ['Biospecimen', 'Sample', 'BID', 'Assay', 'Protocol'],
+                'data': random_table_data
+            }
+            # for i in range(2):
+            #     temp_library_table_data4['data'] += temp_library_table_data4['data']
+            # print(len(temp_library_table_data4['data']))
+            return HttpResponse(json.dumps(temp_library_table_data4))
+
     class Manage(View):
         """
         This is Thomas' library view class
@@ -186,6 +219,78 @@ class LibraryViews(object):
             # TODO Restrict results to only Projects the user is on
             groupby_options = HierarchyEntity.get_hierarchy()
 
+            temp_library_table_data3 = json.dumps([
+                {
+                    'id': 1,
+                    'data': ['Project1', 'Bio1', 'Sample1', '2015-100', 'sixteen', 'beta radio']
+                },
+                {
+                    'id': 2,
+                    'data': ['Project1', 'Bio1', 'Sample1', '2015-101', 'nine', 'beta radio']
+                },
+                {
+                    'id': 47,
+                    'data': ['Project1', 'Bio2', 'Sample2', '2015-102', 'sixteen', 'beta radio']
+                },
+                {
+                    'id': 48,
+                    'data': ['Project1', 'Bio2', 'Sample3', '2015-103', 'brain', 'beta radio']
+                },
+                {
+                    'id': 49,
+                    'data': ['Project1', 'Bio2', 'Sample4', '2015-104', 'gardens', 'beta radio']
+                },
+                {
+                    'id': 55,
+                    'data': ['Project2', 'Bio4', 'Sample5', '2015-700', 'alligator sky', 'all things']
+                },
+                {
+                    'id': 56,
+                    'data': ['Project2', 'Bio4', 'Sample6', '2015-701', 'reality is a lovely place', 'all things']
+                }
+            ])
+
+            temp_library_table_data2 = json.dumps([
+                {
+                    'group': 'Beta Radio',
+                    'rows': [
+                        {
+                            'id': 1,
+                            'data': ['2015-100', 'sixteen', 'beta radio']
+                        },
+                        {
+                            'id': 2,
+                            'data': ['2015-101', 'nine', 'beta radio']
+                        },
+                        {
+                            'id': 47,
+                            'data': ['2015-102', 'sixteen', 'beta radio']
+                        },
+                        {
+                            'id': 48,
+                            'data': ['2015-103', 'brain', 'beta radio']
+                        },
+                        {
+                            'id': 49,
+                            'data': ['2015-104', 'gardens', 'beta radio']
+                        },
+                    ]
+                },
+                {
+                    'group': 'Owl City',
+                    'rows': [
+                        {
+                            'id': 55,
+                            'data': ['2015-700', 'alligator sky', 'all things']
+                        },
+                        {
+                            'id': 56,
+                            'data': ['2015-701', 'reality is a lovely place', 'all things']
+                        }
+                    ]
+                },
+            ])
+
             temp_library_table_data = json.dumps([
                 {
                     'groupData': [
@@ -196,7 +301,7 @@ class LibraryViews(object):
                         ['2015-104', 'gardens', 'beta radio'],
                         ['2015-105', 'guts digest', 'beta radio'],
                         ['2015-106', 'worse', 'beta radio'],
-                        ['2015-107', 'say', 'beta radio'],
+                        ['2015-107', 'say', 'beta radio']
                     ],
                     'header': 'Beta Radio is great'
                 },
@@ -217,7 +322,7 @@ class LibraryViews(object):
             ])
 
             context = {
-                'library_display_table': library_display_table,
+                'library_display_table': temp_library_table_data3,
                 'groupby_options': groupby_options,
                 'groupby_current': request.GET.get('group_by'),
             }

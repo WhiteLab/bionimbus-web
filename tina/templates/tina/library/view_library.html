@@ -11,28 +11,28 @@
 {% endblock extra_js %}
 
 {% block content %}
-<div style="display:flex;justify-content: space-between">
-    <input type="text" class="view-library-search" id="tina-search" placeholder="Search" style="background-image: url({% static 'img/Vector_search_icon.svg' %})"/>
-    <select>
-        <option>Apply Filter</option>
-    </select>
-    <select id="tina-groupby">
-        <option value="" disabled hidden{% if not groupby_current %} selected{% endif %}>Group By</option>
-        {% for e in groupby_options %}
-            <option value="{{ e }}"{% if groupby_current == e %} selected{% endif %}>{{ e }}</option>
-        {% endfor %}
-    </select>
-    <div>
-        <button class="tina-btn-inline" style="float:right"><i class="fa fa-bars"></i></button>
-        <button class="tina-btn-inline"><i class="fa fa-th-large"></i></button>
-    </div>
-    <button class="tina-btn-inline">
-        <i class="fa fa-gear"></i>&nbsp;&nbsp;Settings
-    </button>
-</div>
-
-
-    <button type="button" class="tina-btn" id="tina-add-to-cart-btn">Add to Cart</button>
+{#<div style="display:flex;justify-content: space-between">#}
+{#    <input type="text" class="view-library-search" id="tina-search" placeholder="Search" style="background-image: url({% static 'img/Vector_search_icon.svg' %})"/>#}
+{#    <select>#}
+{#        <option>Apply Filter</option>#}
+{#    </select>#}
+{#    <select id="tina-groupby">#}
+{#        <option value="" disabled hidden{% if not groupby_current %} selected{% endif %}>Group By</option>#}
+{#        {% for e in groupby_options %}#}
+{#            <option value="{{ e }}"{% if groupby_current == e %} selected{% endif %}>{{ e }}</option>#}
+{#        {% endfor %}#}
+{#    </select>#}
+{#    <div>#}
+{#        <button class="tina-btn-inline" style="float:right"><i class="fa fa-bars"></i></button>#}
+{#        <button class="tina-btn-inline"><i class="fa fa-th-large"></i></button>#}
+{#    </div>#}
+{#    <button class="tina-btn-inline">#}
+{#        <i class="fa fa-gear"></i>&nbsp;&nbsp;Settings#}
+{#    </button>#}
+{#</div>#}
+{##}
+{##}
+{#    <button type="button" class="tina-btn" id="tina-add-to-cart-btn">Add to Cart</button>#}
 
 
 
@@ -42,9 +42,9 @@
 {#        <rudy-group row-data="[[1,2],[3,5]]" header="{{ header_string }}"></rudy-group>#}
 {#    {% endfor %}#}
 {#</div>#}
-<div style="margin-top: 50px"></div>
+{#<div style="margin-top: 50px"></div>#}
 
-<rudy-library-display table-data='{{ library_display_table }}'></rudy-library-display>
+<rudy-library-display table-data-ajax-load="/libraries/data/" entity-hierarchy='["Project", "Biospecimen", "Sample"]'></rudy-library-display>
 
 
 

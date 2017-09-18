@@ -18,8 +18,8 @@
             <input id="rudycheck" type="checkbox" class="tina-small-check">
             <span>{{ header }}</span>
         </div>
-        <template is="dom-repeat" items="{{ rowData }}">
-            <rudy-row col-data="{{ item }}" checked="[[ checked ]]"></rudy-row>
+        <template is="dom-repeat" items="{{ rowData }}" id="all">
+            <rudy-row col-data="{{ item }}" row-id="{{ item.id }}" checked="[[ checked ]]"></rudy-row>
         </template>
     </template>
     <script>
@@ -29,16 +29,26 @@
             properties: {
                 rowData: {
                     type: Array,
-                    value: function(){return []}
+                    value: function(){return []},
                 },
                 header: String,
                 checked: String
             },
 
             ready: function() {
-               this.$.rudycheck.onchange = function(e) {
-                   e.path[2].checked = this.checked;
-               };
+                // This should be changed to an attribute level on-change=""
+                // That way I have access to this for the component
+                this.$.rudycheck.onchange = function(e) {
+                    e.path[2].checked = this.checked;
+                };
+            },
+
+            getCheckedIds: function() {
+                var ids = [];
+                Polymer.dom(this.root).querySelectorAll('rudy-row').forEach(function(r) {
+                    if(r.checked) ids.push(r.rowId);
+                });
+                return ids;
             }
         });
     </script>

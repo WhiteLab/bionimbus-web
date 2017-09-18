@@ -16,9 +16,9 @@
             }
         </style>
         <div>
-            <input id="rudycheck" type="checkbox" class="tina-small-check">
+            <input id="rudycheck" type="checkbox" class="tina-small-check" data-id="{{ colData.id }}" on-change="_checkChange">
         </div>
-        <template is="dom-repeat" items="{{ colData }}">
+        <template is="dom-repeat" items="{{ colData.data }}">
             <div class="item-row">{{ item }}</div>
         </template>
     </template>
@@ -28,14 +28,22 @@
 
             properties: {
                 colData: {
-                    type: Array,
-                    value: function(){return []},
+                    type: Object,
+                    value: function(){return {id: -1}},
                 },
                 checked: {
                     type: String,
                     value: '',
                     observer: '_isChecked'
+                },
+                rowId: {
+                    type: String,
+                    reflectToAttribute: true
                 }
+            },
+
+            _checkChange: function() {
+                this.checked = this.$.rudycheck.checked;
             },
 
             _isChecked: function(newVal) {
