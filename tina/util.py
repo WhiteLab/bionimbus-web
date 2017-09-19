@@ -1,13 +1,19 @@
 import json
+from copy import copy
+from collections import deque, defaultdict, namedtuple
+
 import couchdb
 from PIL import Image
 from resizeimage import resizeimage
 
 from ua_parser import user_agent_parser
-
 from django.conf import settings
+from django.apps import apps
+
+import tina.models
 
 THUMBNAIL_SIZE = (265, 265)
+FIRST, LAST = 0, -1
 
 
 def find_is_windows(request):
@@ -87,7 +93,7 @@ def generate_html(tag, attrs=None, self_closing=False, content=''):
     return tag_template.format(**tag_dict)
 
 
-class TinaCouchDB:
+class TinaCouchDB(object):
     """
     Utility methods are dealing with the documents in the Tina CouchDB database.
     """
@@ -151,3 +157,116 @@ class TinaCouchDB:
             tina_db.delete(TinaCouchDB.get_tina_doc(doc_id))
         except couchdb.ResourceConflict:
             raise
+
+
+class HierarchyEntity(object):
+    @staticmethod
+    def get_hierarchy(as_strings=True, include_terminal=False):
+        """
+        Returns the entity hierarchy from the top down.
+
+        :param as_strings: bool If True, will return entities by their string name
+        :param include_terminal: bool If True, will include the terminal entity
+        :return: list The entity hierarchy from the top down
+        """
+        hierarchy = [e for e in apps.get_models() if getattr(e, '_initial_entity', False)]
+
+        # Loop through children until the terminal entity is reached
+        curr_entity = hierarchy[FIRST].child_class()
+        while not getattr(curr_entity, '_terminal_entity', False):
+            hierarchy.append(curr_entity)
+            curr_entity = curr_entity.child_class()
+
+        # If include_terminal is True, add the terminal entity to hierarchy
+        if include_terminal:
+            hierarchy.append(curr_entity)
+
+        if as_strings:
+            return [e.__name__ for e in hierarchy]
+        return hierarchy
+
+
+class LibraryTable(object):
+    """
+    Utility methods related to render the display table for viewing Libraries
+    """
+    TableRow = namedtuple('TableRow', 'library_inst row_content')
+
+    def __init__(self, libraries, columns):
+        self.table = defaultdict(list)
+
+        # Get all Libraries grouped by it's immediate superior model
+        for library in libraries.order_by('parent_model'):
+            row_content = [str(getattr(library, col, '')) for col in columns]
+            self.table[library.parent_model.lineage(to_root=False)].append(
+                LibraryTable.TableRow(library_inst=library, row_content=row_content)
+            )
+        self.table = dict(self.table)
+
+    def groupby(self, groupby_entity):
+        # If the user requests a higher level model, do that here until it's satisfied
+        while not isinstance(next(self.table.iterkeys())[LAST], groupby_entity):
+            _table = dict()
+            for grouping, table_rows in self.table.iteritems():
+                new_grouping, moving_entity = grouping[:LAST], grouping[LAST]
+                for table_row in table_rows:
+                    table_row.row_content.append(moving_entity.name)
+                _table[new_grouping] = table_rows
+            self.table = _table
+
+        return self
+
+    def groups_to_str(self):
+        # Convert tuple keys to string keys
+        _table = dict()
+        for grouping, table_rows in self.table.iteritems():
+            header_str = ' > '.join([e.name for e in grouping])
+            _table[header_str] = table_rows
+        self.table = _table
+
+        return self
+
+    def to_json(self):
+        json_obj = list()
+        for grouping, table_rows in self.table.iteritems():
+            json_obj.append({
+                'groupData': [table_row.row_content for table_row in table_rows],
+                'header': grouping
+            })
+        return json.dumps(json_obj)
+
+    def render(self):
+        import random
+        import string
+        for grouping, table_rows in self.table.iteritems():
+            for table_row in table_rows:
+                table_row.row_content.extend([''.join([string.ascii_letters[random.randint(0,51)] for i in range(random.randint(1,100))]) for s in range(4)])
+        return self.table
+
+    # @staticmethod
+    # def _groupby(groupby_entity):
+    #     library_display_table = defaultdict(list)
+    #     # TODO Filter on Projects the User is assigned to
+    #     # Get all Libraries grouped by it's immediate superior model
+    #     for library in tina.models.Library.objects.all().order_by('parent_model'):
+    #         library_display_table[library.parent_model.lineage(to_root=False)].append(
+    #             deque([library])
+    #         )
+    #
+    #     # If the user requests a higher level model, do that here until it's satisfied
+    #     while not isinstance(next(library_display_table.iterkeys())[LAST], groupby_entity):
+    #         _table = dict()
+    #         for grouping, table_rows in library_display_table.iteritems():
+    #             new_grouping, moving_entity = grouping[:LAST], grouping[LAST]
+    #             for table_row in table_rows:
+    #                 table_row.appendleft(moving_entity.name)
+    #             _table[new_grouping] = table_rows
+    #         library_display_table = _table
+    #
+    #     # Convert tuple keys to string keys
+    #     _table = dict()
+    #     for grouping, table_rows in library_display_table.iteritems():
+    #         header_str = ' > '.join([e.name for e in grouping])
+    #         _table[header_str] = table_rows
+    #
+    #     return _table

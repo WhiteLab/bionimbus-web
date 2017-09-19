@@ -1,0 +1,134 @@
+<link rel="import" href="/static/polymer/polymer.html">
+<link rel="import" href="rudy-table.html">
+<link rel="import" href="rudy-table-controls.html">
+
+<dom-module id="rudy-library-display">
+    <template>
+        <rudy-table-controls id="controls" entities="{{ entityHierarchy }}" group-by-value="{{ groupBy }}"></rudy-table-controls>
+        <div id="loading">Loading data...</div>
+        <rudy-table id="table" table-data="{{ _filteredDisplayTableData }}" header-data="{{ _filteredHeaderData }}"></rudy-table>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-library-display',
+
+            properties: {
+                tableData: {
+                    type: Array,
+                    value: function(){return []}
+                },
+                tableDataAjaxLoad: String,
+                entityHierarchy: {
+                    type: Array,
+                    value: function(){return ['Project']}
+                },
+                groupBy: {
+                    type: String,
+                    observer: 'filter'
+                },
+                displayPage: {
+                    type: Number,
+                    value: 0,
+                    observer: 'filter'
+                },
+                _filteredDisplayTableData: {
+                    type: Array,
+                    value: function(){return []},
+                },
+                _filteredHeaderData: {
+                    type: Array,
+                    value: function(){return []}
+                }
+            },
+
+            listeners: {
+                'controls.addidstocart': 'addIdsToCart',
+                'controls.pageright': 'pageRight',
+                'controls.pageleft': 'pageLeft'
+            },
+
+            ready: function() {
+                var this_ = this;
+
+                // Set some values for pagination development
+                this.rowsPerPage = 20;
+                this.groupBy = this.entityHierarchy[0];
+
+                jQuery.get(this.tableDataAjaxLoad, function(data){
+                    var data_ = JSON.parse(data);
+                    this_.tableData = data_.data;
+                    this_._filteredHeaderData = data_.headers;
+                    this_.filter();
+                    this_.$.loading.style = 'display:none';
+                });
+
+
+            },
+
+            filter: function() {
+                /*
+                 * The filter function modifies the original data fed into the component for display.
+                 * The following filters are applied in order:
+                 *     - pagination
+                 *     - group by
+                 *
+                 * This function is called any time a change is made to any of the filters.
+                 *
+                 * table data -> pagination -> group by
+                 */
+                this.paginate();
+                console.log('Displaying page ' + this.displayPage);
+                this.groupRowsByEntity(this.groupBy);
+            },
+
+            paginate: function() {
+                var start = this.displayPage * this.rowsPerPage;
+                var stop = start + this.rowsPerPage;
+                this._filteredDisplayTableData = this.tableData.slice(start, stop);
+            },
+
+            groupRowsByEntity: function(entity) {
+                var grouped = [];
+                var level = this.entityHierarchy.indexOf(entity);
+                this._filteredDisplayTableData.forEach(function(row) {
+                    var header = row.data.slice(0, level + 1).join(' > ');
+                    var rowData = row.data.slice(level + 1);
+                    var groupObject = grouped.find(function(e){return e.group === header});
+                    if(groupObject !== undefined) {
+                        groupObject.rows.push({id: row.id, data: rowData});
+                    } else {
+                        grouped.push({
+                            group: header,
+                            rows: [{id: row.id, data: rowData}]
+                        })
+                    }
+                });
+                this._filteredDisplayTableData = grouped;
+            },
+
+            addIdsToCart: function() {
+                /*
+                 * This function will be written specifically for Tina
+                 *
+                 * sendSocketMessage() and makeToast() are defined in the <head> tag
+                 * of this particular page in Tina
+                 */
+                var libPrimaryKeys = this.$.table.getCheckedIds();
+                if (libPrimaryKeys.length > 0){
+                    sendSocketMessage({library_pks: libPrimaryKeys});
+                } else {
+                    makeToast({text: 'No libraries were selected.'})
+                }
+            },
+
+            pageRight: function() {
+                var maxPage = Math.floor(this.tableData.length / this.rowsPerPage);
+                if(this.displayPage < maxPage) this.displayPage += 1;
+            },
+
+            pageLeft: function() {
+                if(this.displayPage > 0) this.displayPage -= 1;
+            }
+        });
+    </script>
+</dom-module>

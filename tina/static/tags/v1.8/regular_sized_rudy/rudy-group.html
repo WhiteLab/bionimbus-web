@@ -1,0 +1,55 @@
+<link rel="import" href="/static/polymer/polymer.html">
+<link rel="import" href="rudy-row.html">
+
+<dom-module id="rudy-group">
+    <template>
+        <style>
+            #header-row {
+                background-color: #138a36;
+                border-top: 3px solid #141914;
+                border-bottom: 3px solid #141914;
+                padding-left: 2rem;
+                font-size: 1.6rem;
+                color: #e1e6e1;
+                width: 100%;
+            }
+        </style>
+        <div id="header-row">
+            <input id="rudycheck" type="checkbox" class="tina-small-check">
+            <span>{{ header }}</span>
+        </div>
+        <template is="dom-repeat" items="{{ rowData }}" id="all">
+            <rudy-row col-data="{{ item }}" row-id="{{ item.id }}" checked="[[ checked ]]"></rudy-row>
+        </template>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-group',
+
+            properties: {
+                rowData: {
+                    type: Array,
+                    value: function(){return []},
+                },
+                header: String,
+                checked: String
+            },
+
+            ready: function() {
+                // This should be changed to an attribute level on-change=""
+                // That way I have access to this for the component
+                this.$.rudycheck.onchange = function(e) {
+                    e.path[2].checked = this.checked;
+                };
+            },
+
+            getCheckedIds: function() {
+                var ids = [];
+                Polymer.dom(this.root).querySelectorAll('rudy-row').forEach(function(r) {
+                    if(r.checked) ids.push(r.rowId);
+                });
+                return ids;
+            }
+        });
+    </script>
+</dom-module>

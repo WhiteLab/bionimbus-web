@@ -83,6 +83,10 @@ input {
       background-color: $darker_platinum;
       border-color: transparent;
     }
+
+    &.tina-small-check {
+      @include transform(scale(0.65));
+    }
   }
 }
 
@@ -106,8 +110,6 @@ select {
     color: #bbb;
   }
 }
-
-
 
 form.neat-form {
   @include outer-container;

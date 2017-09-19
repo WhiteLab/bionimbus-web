@@ -2,6 +2,8 @@ import os
 import json
 import importlib
 
+from collections import defaultdict, deque
+
 import couchdb
 
 from django.shortcuts import render
@@ -13,12 +15,12 @@ from django.conf import settings
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 
-from models import Project, SequencingFacility, Library, Downloader
+import tina.models
+from tina.models import Project, SequencingFacility, Library, Downloader, Biospecimen, Sample
 from forms import ProjectForm
-from util import resize_project_thumbnail, TinaCouchDB, find_is_windows
+from util import resize_project_thumbnail, TinaCouchDB, find_is_windows, LibraryTable, HierarchyEntity
 import seqfacility
 from downloaders.util import create_bundle
-
 
 class ProjectViews(object):
     class Manage(View):
@@ -149,14 +151,180 @@ class ProjectViews(object):
 
 
 class LibraryViews(object):
+    class TableDisplayAJAX(View):
+        def get(self, request):
+            # import time
+            # time.sleep(1)
+            projects = ['Project1', 'Project2']
+            biospecimens = ['Bio1', 'Bio2', 'Bio3', 'Bio4']
+            bid_counter = 100
+            from random_words import RandomWords
+            from random import choice, randint
+            words = RandomWords().random_words(count=25)
+            random_table_data = list()
+            for i in range(45):
+                random_table_data.append({
+                    'id': i,
+                    'data': [
+                        choice(projects),
+                        choice(biospecimens),
+                        'Sample{}'.format(randint(1, 15)),
+                        '2017-{}'.format(bid_counter),
+                        choice(words),
+                        choice(words)
+                    ]
+                })
+                bid_counter += 1
+            temp_library_table_data4 = {
+                'headers': ['Biospecimen', 'Sample', 'BID', 'Assay', 'Protocol'],
+                'data': random_table_data
+            }
+            # for i in range(2):
+            #     temp_library_table_data4['data'] += temp_library_table_data4['data']
+            # print(len(temp_library_table_data4['data']))
+            return HttpResponse(json.dumps(temp_library_table_data4))
+
+    class Manage(View):
+        """
+        This is Thomas' library view class
+        """
+        def get(self, request):
+            bid1 = {'bid':'1','project': 'PEC', 'status': 'submitted'}
+            bid2 = {'bid':'2','project': 'mod', 'status': 'processed'}
+            bid3 = {'bid':'3','project': 'PanCan', 'status': 'processing'}
+            testContext = [bid1, bid2, bid3]
+            context = {
+                'bids': testContext
+            }
+            return render(request, 'tina/project/view_libraries.html', context)
+
     class ViewLibraries(View):
+        """
+        This is Dominic's library view class
+        """
         def get(self, request):
             # Set cart session variable
             if 'cart' not in request.session:
                 request.session['cart'] = list()
 
+            display_class = getattr(tina.models, request.GET.get('group_by', ''), Sample)
+
+            library_display_table = (
+                LibraryTable(Library.objects.all(), columns=('name', 'assay', 'read_length', 'barcode'))
+                    .groupby(groupby_entity=display_class)
+                    .groups_to_str().to_json()
+            )
+            print(library_display_table)
+
+            # TODO Restrict results to only Projects the user is on
+            groupby_options = HierarchyEntity.get_hierarchy()
+
+            temp_library_table_data3 = json.dumps([
+                {
+                    'id': 1,
+                    'data': ['Project1', 'Bio1', 'Sample1', '2015-100', 'sixteen', 'beta radio']
+                },
+                {
+                    'id': 2,
+                    'data': ['Project1', 'Bio1', 'Sample1', '2015-101', 'nine', 'beta radio']
+                },
+                {
+                    'id': 47,
+                    'data': ['Project1', 'Bio2', 'Sample2', '2015-102', 'sixteen', 'beta radio']
+                },
+                {
+                    'id': 48,
+                    'data': ['Project1', 'Bio2', 'Sample3', '2015-103', 'brain', 'beta radio']
+                },
+                {
+                    'id': 49,
+                    'data': ['Project1', 'Bio2', 'Sample4', '2015-104', 'gardens', 'beta radio']
+                },
+                {
+                    'id': 55,
+                    'data': ['Project2', 'Bio4', 'Sample5', '2015-700', 'alligator sky', 'all things']
+                },
+                {
+                    'id': 56,
+                    'data': ['Project2', 'Bio4', 'Sample6', '2015-701', 'reality is a lovely place', 'all things']
+                }
+            ])
+
+            temp_library_table_data2 = json.dumps([
+                {
+                    'group': 'Beta Radio',
+                    'rows': [
+                        {
+                            'id': 1,
+                            'data': ['2015-100', 'sixteen', 'beta radio']
+                        },
+                        {
+                            'id': 2,
+                            'data': ['2015-101', 'nine', 'beta radio']
+                        },
+                        {
+                            'id': 47,
+                            'data': ['2015-102', 'sixteen', 'beta radio']
+                        },
+                        {
+                            'id': 48,
+                            'data': ['2015-103', 'brain', 'beta radio']
+                        },
+                        {
+                            'id': 49,
+                            'data': ['2015-104', 'gardens', 'beta radio']
+                        },
+                    ]
+                },
+                {
+                    'group': 'Owl City',
+                    'rows': [
+                        {
+                            'id': 55,
+                            'data': ['2015-700', 'alligator sky', 'all things']
+                        },
+                        {
+                            'id': 56,
+                            'data': ['2015-701', 'reality is a lovely place', 'all things']
+                        }
+                    ]
+                },
+            ])
+
+            temp_library_table_data = json.dumps([
+                {
+                    'groupData': [
+                        ['2015-100', 'sixteen', 'beta radio'],
+                        ['2015-101', 'nine', 'beta radio'],
+                        ['2015-102', 'sixteen', 'beta radio'],
+                        ['2015-103', 'brain', 'beta radio'],
+                        ['2015-104', 'gardens', 'beta radio'],
+                        ['2015-105', 'guts digest', 'beta radio'],
+                        ['2015-106', 'worse', 'beta radio'],
+                        ['2015-107', 'say', 'beta radio']
+                    ],
+                    'header': 'Beta Radio is great'
+                },
+                {
+                    'groupData': [
+                        ['2016-700', 'sparrow', 'who are you']
+                    ],
+                    'header': 'A Single Sample'
+                },
+                {
+                    'groupData': [
+                        ['2017-345', 'one', 'everybody knew'],
+                        ['2017-366', 'twenty', 'obeyed'],
+                        ['2017-397', 'seven thousand', 'it was splitting through the trees'],
+                    ],
+                    'header': 'Oh my White Fawn'
+                },
+            ])
+
             context = {
-                'libraries': Library.objects.all()
+                'library_display_table': temp_library_table_data3,
+                'groupby_options': groupby_options,
+                'groupby_current': request.GET.get('group_by'),
             }
             return render(request, 'tina/library/view_library.html', context)
 
@@ -179,17 +347,6 @@ class SubmitViews(object):
             }
             return render(request, 'tina/submit/submit.html', context)
 
-class LibraryViews:
-    class Manage(View):
-        def get(self, request):
-            bid1 = {'bid':'1','project': 'PEC', 'status': 'submitted'}
-            bid2 = {'bid':'2','project': 'mod', 'status': 'processed'}
-            bid3 = {'bid':'3','project': 'PanCan', 'status': 'processing'}
-            testContext = [bid1, bid2, bid3]
-            context = {
-                'bids': testContext
-            }
-            return render(request, 'tina/project/view_libraries.html', context)
 
 class CartViews(object):
     class ViewCart(View):

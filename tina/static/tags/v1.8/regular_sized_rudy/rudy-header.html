@@ -1,0 +1,41 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="rudy-header">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-flow: row nowrap;
+                margin-top: 15px;
+            }
+            .item-row {
+                display: flex;
+                flex-flow: row nowrap;
+                flex-grow: 1;
+                flex-basis: 0;
+                word-break: break-all;
+                font-weight: bold;
+                font-size: 2.5rem;
+            }
+            input[type="checkbox"] {
+                visibility: hidden;
+            }
+        </style>
+        <div><input type="checkbox" class="tina-small-check"></div>
+        <template is="dom-repeat" items="{{ headerData }}">
+            <div class="item-row">{{ item }}</div>
+        </template>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-header',
+
+            properties: {
+                headerData: {
+                    type: Array,
+                    value: function(){return []},
+                }
+            }
+        });
+    </script>
+</dom-module>

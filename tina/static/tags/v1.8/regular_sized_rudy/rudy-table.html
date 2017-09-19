@@ -1,0 +1,43 @@
+<link rel="import" href="/static/polymer/polymer.html">
+<link rel="import" href="rudy-group.html">
+<link rel="import" href="rudy-header.html">
+
+<dom-module id="rudy-table">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-flow: column nowrap;
+                justify-content: space-between;
+            }
+        </style>
+        <rudy-header header-data="{{ headerData }}"></rudy-header>
+        <template is="dom-repeat" items="{{ tableData }}">
+            <rudy-group row-data="{{ item.rows }}" header="{{ item.group }}"></rudy-group>
+        </template>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-table',
+
+            properties: {
+                tableData: {
+                    type: Array,
+                    value: function(){return []}
+                },
+                headerData: {
+                    type: Array,
+                    value: function(){return []}
+                }
+            },
+
+            getCheckedIds: function() {
+                var ids = [];
+                Polymer.dom(this.root).querySelectorAll('rudy-group').forEach(function(g) {
+                    ids.push.apply(ids, g.getCheckedIds());
+                });
+                return ids;
+            }
+        });
+    </script>
+</dom-module>

@@ -44,6 +44,12 @@ a.tina-btn {
     @include transition(background-color 0.3s ease);
   }
 
+  &-inline {
+    @extend .tina-btn;
+    width: inherit;
+    padding: 8px 8px;
+  }
+
   &-lg {
     @extend .tina-btn;
     font-size: 3rem;
@@ -55,6 +61,12 @@ a.tina-btn {
     &:before {
       height: 8px;
     }
+
+    &-inline {
+      @extend .tina-btn-lg;
+      width: inherit;
+      padding: 16px 16px;
+    }
   }
 
   &-sm {
@@ -64,6 +76,12 @@ a.tina-btn {
 
     &:before {
       height: 2px;
+    }
+
+    &-inline {
+      @extend .tina-btn-sm;
+      width: inherit;
+      padding: 2px 8px;
     }
   }
 }

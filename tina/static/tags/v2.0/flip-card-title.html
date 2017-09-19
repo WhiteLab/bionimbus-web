@@ -1,0 +1,38 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="flip-card-title">
+    <template>
+        <style>
+            :host {
+                margin-bottom: 6px;
+            }
+            /*:host {
+                position: relative;
+                flex-grow: 1;
+            }
+
+            :host span {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                background-color: #fcfcfc;
+                font-size: 1.2rem;
+                padding-left: 4%;
+                padding-right: 4%;
+                padding-bottom: 4px;
+            }*/
+        </style>
+        <content></content>
+    </template>
+
+    <script>
+        class FlipCardTitle extends Polymer.Element {
+            static get is() { return 'flip-card-title' }
+            constructor() { super(); }
+        }
+        customElements.define(FlipCardTitle.is, FlipCardTitle)
+        /*Polymer({
+            is: 'flip-card-title'
+        });*/
+    </script>
+</dom-module>

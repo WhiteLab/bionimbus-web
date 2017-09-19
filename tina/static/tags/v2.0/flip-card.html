@@ -1,0 +1,114 @@
+<link rel="import" href="/static/polymer/polymer.html">
+<link rel="import" href="flip-card-title.html">
+<link rel="import" href="flip-card-description.html">
+<link rel="import" href="flip-card-footnote.html">
+
+<dom-module id="flip-card">
+    <template>
+        <style>
+            :host {
+              float: left;
+              position: relative;
+              margin-right: 2.35765%;
+              width: 23.23176%;
+              height: 300px;
+              background-color: #fcfcfc;
+              display: flex;
+              flex-direction: column;
+              margin-bottom: 25px;
+              box-shadow: none;
+              transition: box-shadow 0.2s;
+            }
+            :host:last-child {
+              margin-right: 0;
+            }
+            :host:nth-child(4n) {
+              margin-right: 0;
+            }
+            :host:hover {
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+            }
+            :host:hover > header:nth-of-type(1) {
+              height: 20%;
+            }
+            :host:hover > section:nth-of-type(1) header {
+              font-size: 2rem;
+            }
+            :host:hover > section:nth-of-type(1) article {
+              opacity: 1;
+            }
+            :host > header {
+              flex-grow: 0;
+              flex-shrink: 0;
+              height: 50%;
+              transition: height 0.2s;
+              background-position: center;
+              background-size: cover;
+              border-bottom: 3px solid #138a36;
+            }
+            :host > section {
+              flex-grow: 0;
+              overflow: hidden;
+              padding-left: 4%;
+              padding-right: 4%;
+            }
+            :host > section > header {
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 300;
+              font-size: 2.2rem;
+              border-bottom: 1px solid #e1e6e1;
+              transition: font-size 0.15s;
+              margin-bottom: 6px;
+            }
+            :host > section > article {
+              max-width: 1200px;
+              margin-left: auto;
+              margin-right: auto;
+              opacity: 0;
+              transition: opacity 0.15s;
+            }
+            :host > section > article::after {
+              clear: both;
+              content: "";
+              display: table;
+            }
+        </style>
+
+        <header style="background-image:{{ background }};background-color:{{ background }}"></header>
+        <section>
+            <header>
+                <div><content select="flip-card-title"></content></div>
+            </header>
+            <article>
+                <content select="flip-card-description"></content>
+            </article>
+        </section>
+        <content select="flip-card-footnote"></content>
+
+    </template>
+
+    <script>
+        class FlipCard extends Polymer.Element {
+            static get is() { return 'flip-card' }
+            constructor() { super(); }
+            static get properties() {
+                return {
+                    background: {
+                        type: String,
+                        value: 'rgb(67, 124, 144)'
+                    }
+                }
+            }
+        }
+        customElements.define(FlipCard.is, FlipCard);
+        /*Polymer({
+            is: 'flip-card',
+            properties: {
+                'background': {
+                    type: String,
+                    value: 'rgb(67, 124, 144)'
+                }
+            }
+        });*/
+    </script>
+</dom-module>
