@@ -17,8 +17,8 @@ from django.contrib.auth.decorators import login_required
 
 import tina.models
 from tina.models import Project, SequencingFacility, Library, Downloader, Biospecimen, Sample
-from forms import ProjectForm
-from util import resize_project_thumbnail, TinaCouchDB, find_is_windows, LibraryTable, HierarchyEntity
+from tina.forms import ProjectForm
+from tina.util import resize_project_thumbnail, TinaCouchDB, LibraryTable, HierarchyEntity, find_is_windows
 import seqfacility
 from downloaders.util import create_bundle
 

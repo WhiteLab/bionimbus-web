@@ -22,6 +22,11 @@
                     type: Array,
                     value: function(){return ['Project']}
                 },
+                searchToken: {
+                    type: String,
+                    observer: 'filter',
+                    value: ''
+                },
                 groupBy: {
                     type: String,
                     observer: 'filter'
@@ -44,7 +49,8 @@
             listeners: {
                 'controls.addidstocart': 'addIdsToCart',
                 'controls.pageright': 'pageRight',
-                'controls.pageleft': 'pageLeft'
+                'controls.pageleft': 'pageLeft',
+                'controls.searchgo': 'searchGo'
             },
 
             ready: function() {
@@ -54,14 +60,34 @@
                 this.rowsPerPage = 20;
                 this.groupBy = this.entityHierarchy[0];
 
+                // Set a small delay in ms for search
+                this.SEARCH_DELAY = 400;
+                this.searchTimeout = null;
+                this.searchIndex = null;
+
+
+                // Get the table data from the server
                 jQuery.get(this.tableDataAjaxLoad, function(data){
                     var data_ = JSON.parse(data);
                     this_.tableData = data_.data;
                     this_._filteredHeaderData = data_.headers;
+
+                    // Set up search index
+                    this_.searchIndex = lunr(function() {
+                        /* TODO This can't do partial matches, look into LokiJS or PourOver */
+                        var lunr_ = this;
+                        this.field('data');
+                        this.ref('id');
+
+                        // Add all documents to the index
+                        this_.tableData.forEach(function(doc) {
+                            lunr_.add({id: doc.id, data: doc.data.join(' ')});
+                        });
+                    });
+
                     this_.filter();
                     this_.$.loading.style = 'display:none';
                 });
-
 
             },
 
@@ -74,8 +100,11 @@
                  *
                  * This function is called any time a change is made to any of the filters.
                  *
-                 * table data -> pagination -> group by
+                 * table data -> search -> pagination -> group by
                  */
+                console.log('Applying search filter');
+                this.applySearch();
+                console.log('Applying pagination');
                 this.paginate();
                 console.log('Displaying page ' + this.displayPage);
                 this.groupRowsByEntity(this.groupBy);
@@ -84,7 +113,32 @@
             paginate: function() {
                 var start = this.displayPage * this.rowsPerPage;
                 var stop = start + this.rowsPerPage;
-                this._filteredDisplayTableData = this.tableData.slice(start, stop);
+                this._filteredDisplayTableData = this._filteredDisplayTableData.slice(start, stop);
+            },
+
+            applySearch: function() {
+                // Do no filtering if search box is empty
+                if (this.searchToken.trim() === '') {
+                    this._filteredDisplayTableData = this.tableData;
+                    return;
+                }
+
+                // Perform search and get resulting data IDs
+                var showIds = new Set();
+                this.searchIndex.search(this.searchToken).forEach(function(result) {
+                    showIds.add(Number(result.ref));
+                });
+
+                // Allow rows with matching data IDs through the filter
+                var inSearch = [];
+                for (var i = 0, ftlen = this.tableData.length; i < ftlen; i++) {
+                    if (showIds.has(this.tableData[i].id)) {
+                        inSearch.push(this.tableData[i]);
+                    }
+                }
+
+                // Set filtered display table data
+                this._filteredDisplayTableData = inSearch;
             },
 
             groupRowsByEntity: function(entity) {
@@ -108,16 +162,16 @@
 
             addIdsToCart: function() {
                 /*
-                 * This function will be written specifically for Tina
+                 * This function is written specifically for Tina
                  *
                  * sendSocketMessage() and makeToast() are defined in the <head> tag
                  * of this particular page in Tina
                  */
                 var libPrimaryKeys = this.$.table.getCheckedIds();
-                if (libPrimaryKeys.length > 0){
+                if (libPrimaryKeys.length > 0) {
                     sendSocketMessage({library_pks: libPrimaryKeys});
                 } else {
-                    makeToast({text: 'No libraries were selected.'})
+                    makeToast({text: 'No libraries were selected.'});
                 }
             },
 
@@ -128,6 +182,17 @@
 
             pageLeft: function() {
                 if(this.displayPage > 0) this.displayPage -= 1;
+            },
+
+            searchGo: function (event) {
+                if (this.searchTimeout !== null) {
+                    window.clearTimeout(this.searchTimeout);
+                }
+
+                var this_ = this;
+                this.searchTimeout = window.setTimeout(function() {
+                    this_.searchToken = event.target.$['tina-search'].value;
+                }, this.SEARCH_DELAY);
             }
         });
     </script>
