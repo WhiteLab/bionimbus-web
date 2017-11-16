@@ -474,6 +474,7 @@ html {
   background-color: white;
   background-position: 2rem 50%;
   background-repeat: no-repeat;
+  background-image: url("../img/Vector_search_icon.svg");
 }
 .view-library-table {
   width: 100%;
