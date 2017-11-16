@@ -1,0 +1,78 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="rudy-table-controls">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                justify-content: space-between;
+            }
+        </style>
+
+        <!-- Search Box -->
+        <!-- Under Construction -->
+        <input type="text" class="view-library-search" id="tina-search" placeholder="Search" on-keyup="searchGo"/>
+
+        <!-- Filter Selector -->
+        <!-- Under Construction -->
+        <!--<select>
+            <option>Apply Filter</option>
+            <option>Under Construction</option>
+        </select>-->
+
+        <!-- Group by Selector -->
+        <select id="groupBySelect" on-change="groupByChange">
+            <option value="" disabled hidden selected>Group By</option>
+            <template is="dom-repeat" items="{{ entities }}">
+                <option value$="{{ item }}">{{ item }}</option>
+            </template>
+        </select>
+
+        <!-- Page Navigation Buttons -->
+        <div>
+            <button class="tina-btn-inline" style="float:right" on-click="pageRight">Next Page&nbsp;&nbsp;<i class="fa fa-caret-right"></i></button>
+            <button class="tina-btn-inline" style="float:right" on-click="pageLeft"><i class="fa fa-caret-left"></i>&nbsp;&nbsp;Last Page</button>
+        </div>
+
+        <!-- Add to Cart Button -->
+        <button class="tina-btn-inline" id="cart-btn" on-tap="addIdsToCart">
+            <i class="fa fa-cart-plus"></i>&nbsp;&nbsp;Add to Cart
+        </button>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-table-controls',
+
+            properties: {
+                entities: {
+                    type: Array,
+                    value: function(){return []}
+                },
+                groupByValue: {
+                    type: String,
+                    notify: true
+                }
+            },
+
+            groupByChange: function(e) {
+                this.groupByValue = e.target.value;
+            },
+
+            addIdsToCart: function() {
+                this.fire('addidstocart');
+            },
+
+            pageRight: function() {
+                this.fire('pageright');
+            },
+
+            pageLeft: function() {
+                this.fire('pageleft');
+            },
+
+            searchGo: function() {
+                this.fire('searchgo');
+            }
+        });
+    </script>
+</dom-module>

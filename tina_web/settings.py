@@ -148,7 +148,10 @@ BOWER_INSTALLED_APPS = (
     'bourbon#4.3.3',
     'neat#1.8.0',
 
-    'polymer#1.8.1', 'PolymerElements/iron-icon#1.0.12'
+    # 'polymer#^2.0.0', 'PolymerElements/iron-icon#^2.0.0'  Eventually move to Polymer 2.0
+    'polymer#1.8.1', 'PolymerElements/iron-icon#^1.0.12',
+
+    'lunr'
 
     # 'bottom-drawer'  # Polymer element
 )

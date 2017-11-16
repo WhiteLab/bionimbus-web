@@ -7,7 +7,8 @@
     <title>{% strings 'app_name' %}{% block extended_title %}{% endblock %}</title>
 
     <!-- Polymer -->
-    <script src="{% static 'webcomponentsjs/webcomponents-lite.min.js' %}"></script>
+    <script src="{% static 'webcomponentsjs/webcomponents.js' %}"></script>
+
 
     <!-- Google Web Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro:300,400" rel="stylesheet">
@@ -32,8 +33,11 @@
     <link rel="stylesheet" href="{% static 'handsontable/dist/handsontable.full.css' %}"/>
 
     <!-- Custom JS utilities -->
+    <script src="{% static 'lunr/lunr.js' %}"></script>
     <script src="{% static 'js/util.js' %}"></script>
     {% block extra_js %}{% endblock %}
+
+{#    <script src="{% static "tablesorter/tablesorter.js" %}"></script>#}
 </head>
 <body>
     <div class="tina-content">
@@ -54,6 +58,7 @@
         </div>
     </div>
 
+    <div class="footer-strip"></div>
     <footer class="tina-footer">{% include 'tina/footer.html' %}</footer>
 </body>
 </html>

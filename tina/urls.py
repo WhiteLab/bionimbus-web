@@ -4,13 +4,32 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
 import seqfacility
+
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
+
 from views import ProjectViews, LibraryViews, SubmitViews, CartViews
+from serializers import UserSerializer
+
+
+# ViewSets define the view behavior.
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+# Routers provide a way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+# router.register(r'groups', views.GroupViewSet)
+
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='tina/home.html'), name='home'),
 
     # Libraries tab
     url(r'^libraries/$', LibraryViews.ViewLibraries.as_view(), name='view_libraries'),
+    url(r'^libraries/data/$', LibraryViews.TableDisplayAJAX.as_view(), name='table_display_ajax'),
 
     url(r'^cart/$', CartViews.ViewCart.as_view(), name='view_cart'),
     url(r'^cart/add/(?P<library_id>\d+)/$', CartViews.AddToCart.as_view(), name='add_to_cart'),
@@ -27,7 +46,7 @@ urlpatterns = [
 
     # Submit Tab
     url(r'^submit/$', SubmitViews.SubmitLibrary.as_view(), name='submit_library'),
-
+    url(r'^libraries2/$', LibraryViews.Manage.as_view(), name='libraries'),
     # Sequencing Facility AJAX
     url(r'^seqfacility/(?P<facility>\w+)/$', seqfacility.get_submit_form,
         name='seqfacility_get_submit_form')

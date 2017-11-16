@@ -1,9 +1,9 @@
 {% extends 'tina/base.html' %}
 {% load staticfiles %}
 {% block content %}
-        <link rel="import" href="{% static 'tags/flip-card.html' %}">
-        <link rel="import" href="{% static 'tags/flip-card-description.html' %}">
-        <link rel="import" href="{% static 'tags/sliding-option-button.html' %}">
+        <link rel="import" href="{% static 'tags/v1.8/flip-card.html' %}">
+        <link rel="import" href="{% static 'tags/v1.8/flip-card-description.html' %}">
+        <link rel="import" href="{% static 'tags/v1.8/sliding-option-button.html' %}">
         <div class="row" style="margin-bottom:50px">
             <div class="tina-progress-bar"></div><br/>
             <div class="tina-sliding-btn-group">
@@ -11,7 +11,7 @@
                 <a href="http://www.google.com" style="background-color: red;">Two</a>
                 <a href="#" style="background-color: orange;">Three</a>
             </div>
-            <sliding-option-button size="l">
+            <sliding-option-button size="l" primary-option-flex="8">
                 <a href="#">One</a>
                 <a href="http://www.google.com">Two</a>
                 <a href="#">Three</a>

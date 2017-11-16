@@ -1,0 +1,52 @@
+{% extends 'tina/base.html' %}
+{% block content %}
+{% load staticfiles %}
+
+
+
+    <script src="{% static 'js/project/view_libraries.js' %}"></script>
+
+    <input title="search" id="librarySearch" class="librarySearch" placeholder="search">
+
+    <table id="libraryTable" class="table table-hover sortable">
+      <thead>
+        <tr>
+          <th ><a>Project</a></th>
+          <th ><a>Bid</a></th>
+          <th ><a>Status</a></th>
+          <th ><a>Details</a></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bid in bids %}
+            <tr>
+{#            {% for i in bid.itervalues %}#}
+                <td class="{{ bid.project }}">
+                    {{ bid.project }}
+                </td>
+                <td class="{{ bid.bid }}">
+                    {{ bid.bid }}
+                </td>
+                <td class="{{ bid.status }}">
+                    {{ bid.status }}
+                </td>
+                <td>
+                    <a class="view">More details</a>
+                </td>
+{#            {% endfor %}#}
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+{#  <script src="../../../../bower_components/bootstrap/dist/css/bootstrap-theme.css"></script>#}
+{#  <script src="../../../../bower_components/bootstrap/dist/js/bootstrap.js"></script>#}
+
+{#  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>#}
+      <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+     <script src="{% static "tablesorter/tablesorter.js" %}"></script>
+
+{% endblock %}

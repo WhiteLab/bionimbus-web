@@ -9,14 +9,14 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 from util import TinaCouchDB
-from tina.mixins import ProjectDescendantMixin
+from tina.mixins import TopLevelEntityMixin, InteriorEntityMixin
 
 
 class UserProfile(models.Model):
     defaults_doc_id = models.CharField('Defaults Doc ID', max_length=128, editable=False)
 
 
-class Project(models.Model):
+class Project(TopLevelEntityMixin, models.Model):
     """
     Represents a project, such as PsychENCODE or Chicago Pancreatic Cancer Initiative
 
@@ -32,6 +32,9 @@ class Project(models.Model):
 
     TODO Projects also store default values for various Library parameters
     """
+    _child_model_class = 'Biospecimen'
+    _initial_entity = True
+
     name = models.CharField('Project Name', max_length=1024, unique=True)
     description = models.TextField('Project Description', blank=True)
     pi = models.ForeignKey('PrincipalInvestigator', null=True, blank=True)
@@ -54,12 +57,6 @@ class Project(models.Model):
         """
         return Project.objects.filter(parent_project=None)
 
-    def project(self, root=False):
-        if not root or not self.is_subproject():
-            return self
-        return self.parent_project.project(root)
-
-
     def is_subproject(self):
         """
         Return whether this Project is a subproject
@@ -71,15 +68,6 @@ class Project(models.Model):
         Get all of this Projects subprojects
         """
         return Project.objects.filter(parent_project=self.pk)
-
-    def lineage(self, strings=False, include_self=True, return_tuple=False):
-        """
-        Get all of this Project's parent projects
-        """
-        self_lineage = [self.name if strings else self] if include_self else list()
-        if self.is_subproject():
-            return self.parent_project.lineage(strings, include_self) + self_lineage
-        return tuple(self_lineage) if return_tuple else self_lineage
 
     def libraries(self, include_subprojects=False):
         """
@@ -123,20 +111,26 @@ class LibraryDocumentDefaultKey(models.Model):
     key = models.CharField(max_length=1024)
 
 
-class Biospecimen(ProjectDescendantMixin, models.Model):
+class Biospecimen(InteriorEntityMixin, models.Model):
     """
     Represents an individual biological organism from which a sample was derived, such as a patient.
     """
+    _parent_model_class = 'Project'
+    _child_model_class = 'Sample'
+
     name = models.CharField('Biospecimen Name', max_length=1024)
-    parent_model = models.ForeignKey('Project', verbose_name='Project')
+    parent_model = models.ForeignKey('Project', verbose_name='Project', related_name='children')
 
 
-class Sample(ProjectDescendantMixin, models.Model):
+class Sample(InteriorEntityMixin, models.Model):
     """
     Represents a biological sample which was taken from a biospecimen.
     """
+    _parent_model_class = 'Biospecimen'
+    _child_model_class = 'Library'
+
     name = models.CharField('Sample Name', max_length=1024)
-    parent_model = models.ForeignKey('Biospecimen', verbose_name='Biospecimen')
+    parent_model = models.ForeignKey('Biospecimen', verbose_name='Biospecimen', related_name='children')
 
 
 class ProjectPerLibraryDetail(models.Model):
@@ -144,13 +138,16 @@ class ProjectPerLibraryDetail(models.Model):
     project = models.ForeignKey('Project')
 
 
-class Library(ProjectDescendantMixin, models.Model):
+class Library(InteriorEntityMixin, models.Model):
     """
     Represents a library of reads which were generated from a sample.
 
     Libraries are the model of primary interest when looking at a Project, but the relationship must
     go through a Sample which must go through a Biospecimen.
     """
+    _parent_model_class = 'Sample'
+    _terminal_entity = True
+
     class Meta:
         verbose_name_plural = 'Libraries'
 
@@ -163,7 +160,7 @@ class Library(ProjectDescendantMixin, models.Model):
         ALL = 'submitted sequencing available'.split()
         STATE_CHOICES = [(choice, choice.capitalize()) for choice in ALL]
 
-    name = models.CharField('Library BID', max_length=1024)
+    name = models.CharField('Library BID', max_length=1024, unique=True)
     assay = models.CharField('Library Assay', max_length=1024)  # TODO How to set default to library default?
     barcode = models.ForeignKey('LibraryBarcode')
     sequencing_protocol = models.CharField('Library Sequencing Protocol', max_length=2, choices=(
@@ -186,7 +183,7 @@ class Library(ProjectDescendantMixin, models.Model):
 
     details_doc_id = models.CharField('Detail Doc Key', max_length=128, editable=False)  # TODO Should this be JSON?
 
-    parent_model = models.ForeignKey('Sample', verbose_name='Sample', blank=True, null=True)
+    parent_model = models.ForeignKey('Sample', verbose_name='Sample', blank=True, null=True, related_name='children')
 
 
 class LibraryData(models.Model):

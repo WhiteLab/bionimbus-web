@@ -1,0 +1,29 @@
+<link rel="import" href="/static/polymer/polymer.html">
+
+<dom-module id="rudy-table-controls-select">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                justify-content: space-between;
+            }
+        </style>
+        <select>
+            <option value="" disabled hidden ></option>
+        </select>
+    </template>
+    <script>
+        Polymer({
+            is: 'rudy-table-controls-select',
+
+            properties: {
+                groupByOptions: {
+                    type: Array,
+                    value: function(){return []}
+                },
+                groupBySelected: String,
+                defaultText: String
+            }
+        });
+    </script>
+</dom-module>
