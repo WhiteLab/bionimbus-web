@@ -26,6 +26,7 @@ promise==2.0.2
 pyparsing==2.2.0
 python-resize-image==1.1.10
 pytz==2017.2
+RandomWords==0.2.1
 redis==2.10.5
 requests==2.12.4
 six==1.10.0

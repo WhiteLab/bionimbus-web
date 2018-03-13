@@ -12,10 +12,10 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import local_settings
+from tina import urljoin
+import tina_web.local_settings as local_settings
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -120,19 +120,31 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Prefixes for URLs
+URL_HOSTNAME = local_settings.URL_HOSTNAME
+RELATIVE_URL_PREFIX = local_settings.RELATIVE_URL_PREFIX
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
+# STATIC_PATH = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = STATIC_PATH
+#
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+
+# LOGIN_URL = '/login/'
+# LOGIN_URL = 'https://igsbconferences.uchicago.edu/Shibboleth.sso/Login'
+
+STATIC_URL = urljoin('/', RELATIVE_URL_PREFIX, 'static')
 STATIC_PATH = os.path.join(BASE_DIR, 'static')
 STATIC_ROOT = STATIC_PATH
 
+MEDIA_URL = urljoin('/', RELATIVE_URL_PREFIX, 'media')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
 
-# LOGIN_URL = '/login/'
-LOGIN_URL = 'https://igsbconferences.uchicago.edu/Shibboleth.sso/Login'
+LOGIN_URL = urljoin(URL_HOSTNAME, 'Shibboleth.sso/Login')
 
 # Bower Django settings
 BOWER_COMPONENTS_ROOT = BASE_DIR
@@ -168,3 +180,5 @@ STRINGS = {
     'app_name': 'Tina',
     'installed_app_name': 'tina'
 }
+
+

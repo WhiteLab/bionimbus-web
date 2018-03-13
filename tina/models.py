@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
-from util import TinaCouchDB
+from tina.util import TinaCouchDB
 from tina.mixins import TopLevelEntityMixin, InteriorEntityMixin
 
 

@@ -14,9 +14,15 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
+
+from tina import urljoin
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'', include('tina.urls')),
-    url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
+    url(r'^{}'.format(urljoin(settings.URL_PREFIX, 'admin/')), admin.site.urls),
+    url(r'^{}'.format(urljoin(settings.URL_PREFIX)), include('tina.urls'))
+
+    # url(r'^admin/', include(admin.site.urls)),
+    # url(r'', include('tina.urls')),
+    # url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
 ]

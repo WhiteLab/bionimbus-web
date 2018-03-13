@@ -74,7 +74,7 @@
 
                     // Set up search index
                     this_.searchIndex = lunr(function() {
-                        /* TODO This can't do partial matches, look into LokiJS or PourOver */
+                        /* TODO Lunr can't do partial matches, look into LokiJS or PourOver */
                         var lunr_ = this;
                         this.field('data');
                         this.ref('id');
@@ -95,6 +95,7 @@
                 /*
                  * The filter function modifies the original data fed into the component for display.
                  * The following filters are applied in order:
+                 *     - search
                  *     - pagination
                  *     - group by
                  *
@@ -176,7 +177,8 @@
             },
 
             pageRight: function() {
-                var maxPage = Math.floor(this.tableData.length / this.rowsPerPage);
+                var maxPage = Math.floor(this._filteredDisplayTableData.length / this.rowsPerPage);
+                //var maxPage = Math.floor(this.tableData.length / this.rowsPerPage);
                 if(this.displayPage < maxPage) this.displayPage += 1;
             },
 

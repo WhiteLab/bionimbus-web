@@ -18,7 +18,6 @@ FIRST, LAST = 0, -1
 
 def find_is_windows(request):
     ua_string = request.META['HTTP_USER_AGENT']
-    print user_agent_parser.Parse(ua_string)
     request.session['is_windows'] = 'windows' in user_agent_parser.Parse(ua_string)['os']['family'].lower()
     return request.session['is_windows']
 
@@ -270,3 +269,4 @@ class LibraryTable(object):
     #         _table[header_str] = table_rows
     #
     #     return _table
+
