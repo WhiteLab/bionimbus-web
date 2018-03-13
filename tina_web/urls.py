@@ -19,8 +19,8 @@ from django.conf import settings
 from tina import urljoin
 
 urlpatterns = [
-    url(r'^{}'.format(urljoin(settings.URL_PREFIX, 'admin/')), admin.site.urls),
-    url(r'^{}'.format(urljoin(settings.URL_PREFIX)), include('tina.urls'))
+    url(r'^{}'.format(urljoin(settings.RELATIVE_URL_PREFIX, 'admin/')), admin.site.urls),
+    url(r'^{}'.format(urljoin(settings.RELATIVE_URL_PREFIX)), include('tina.urls'))
 
     # url(r'^admin/', include(admin.site.urls)),
     # url(r'', include('tina.urls')),
